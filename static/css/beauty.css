@@ -502,3 +502,98 @@ body {
 .toast-close:hover {
     color: #495057;
 }
+
+/* Camera Interface Styles */
+.camera-container {
+    position: relative;
+    display: inline-block;
+    background: #f8f9fa;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.face-overlay {
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0.7;
+}
+
+#cameraVideo {
+    background: #000;
+    border-radius: 8px;
+}
+
+.camera-instructions .alert {
+    border-left: 4px solid #17a2b8;
+}
+
+/* Image Upload Styles */
+.upload-options .btn {
+    transition: all 0.3s ease;
+    border: 2px dashed transparent;
+}
+
+.upload-options .btn:hover {
+    border-style: solid;
+    transform: translateY(-2px);
+}
+
+.upload-options .btn-outline-primary:hover {
+    border-color: var(--beauty-primary);
+}
+
+.upload-options .btn-outline-success:hover {
+    border-color: #28a745;
+}
+
+.image-preview {
+    animation: fadeIn 0.3s ease;
+}
+
+.preview-container {
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.preview-container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Skin Analysis Specific Styles */
+.analysis-tips {
+    border-left: 4px solid var(--beauty-gold);
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+}
+
+.result-card, .routine-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--beauty-primary);
+}
+
+.result-card:hover, .routine-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .upload-options .btn {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+    
+    .camera-container {
+        width: 100%;
+    }
+    
+    .face-overlay {
+        width: 200px;
+        height: 240px;
+    }
+}

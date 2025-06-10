@@ -24,7 +24,37 @@
                             <label for="{{ form.skin_image.id }}" class="form-label">
                                 <i class="fas fa-image me-2"></i>Ảnh khuôn mặt *
                             </label>
-                            {{ form.skin_image(class="form-control form-control-lg", accept="image/*") }}
+                            
+                            <!-- Image upload options -->
+                            <div class="upload-options mb-3">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <label for="{{ form.skin_image.id }}" class="btn btn-outline-primary w-100">
+                                            <i class="fas fa-upload me-2"></i>Tải ảnh lên
+                                        </label>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-outline-success w-100" id="cameraBtn">
+                                            <i class="fas fa-camera me-2"></i>Chụp ảnh
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {{ form.skin_image(class="form-control form-control-lg d-none", accept="image/*") }}
+                            
+                            <!-- Image preview area -->
+                            <div id="imagePreview" class="image-preview mt-3" style="display: none;">
+                                <div class="preview-container text-center p-3 border rounded">
+                                    <img id="previewImg" src="" alt="Preview" class="img-fluid" style="max-height: 300px;">
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePreview()">
+                                            <i class="fas fa-trash me-1"></i>Xóa ảnh
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             {% if form.skin_image.errors %}
                                 <div class="text-danger mt-1">
                                     {% for error in form.skin_image.errors %}
@@ -33,7 +63,7 @@
                                 </div>
                             {% endif %}
                             <div class="form-text">
-                                Tải lên ảnh khuôn mặt rõ nét, không trang điểm để có kết quả chính xác nhất.
+                                Tải lên ảnh hoặc chụp ảnh khuôn mặt rõ nét, không trang điểm để có kết quả chính xác nhất.
                             </div>
                         </div>
                         
@@ -217,6 +247,61 @@
     </div>
 </div>
 {% endblock %}
+
+<!-- Camera Modal -->
+<div class="modal fade" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cameraModalLabel">
+                    <i class="fas fa-camera me-2"></i>Chụp ảnh khuôn mặt
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <!-- Camera instructions -->
+                <div class="camera-instructions mb-3">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Hướng dẫn chụp ảnh:</strong>
+                        <ul class="mb-0 mt-2 text-start">
+                            <li>Đặt khuôn mặt vào khung hình</li>
+                            <li>Đảm bảo ánh sáng đủ và đều</li>
+                            <li>Nhìn thẳng vào camera</li>
+                            <li>Không trang điểm để có kết quả chính xác</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Camera video -->
+                <div class="camera-container position-relative">
+                    <video id="cameraVideo" autoplay muted class="img-fluid rounded" style="max-width: 100%; max-height: 400px;"></video>
+                    <canvas id="cameraCanvas" style="display: none;"></canvas>
+                    
+                    <!-- Captured image preview -->
+                    <img id="capturedImage" class="img-fluid rounded" style="max-width: 100%; max-height: 400px; display: none;" alt="Captured photo">
+                    
+                    <!-- Face detection overlay -->
+                    <div class="face-overlay position-absolute top-50 start-50 translate-middle" style="border: 2px dashed #28a745; width: 250px; height: 300px; border-radius: 50%;"></div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <!-- Camera controls -->
+                <button type="button" class="btn btn-success btn-lg" id="captureBtn">
+                    <i class="fas fa-camera me-2"></i>Chụp ảnh
+                </button>
+                
+                <!-- Captured photo controls -->
+                <button type="button" class="btn btn-primary btn-lg" id="useCapturedBtn" style="display: none;">
+                    <i class="fas fa-check me-2"></i>Sử dụng ảnh này
+                </button>
+                <button type="button" class="btn btn-outline-secondary" id="retakeBtn" style="display: none;">
+                    <i class="fas fa-redo me-2"></i>Chụp lại
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/skin-analysis.js') }}"></script>

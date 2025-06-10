@@ -12,7 +12,7 @@ function initializeSkinAnalysis() {
     if (form) {
         setupFileUpload(fileInput);
         setupFormSubmission(form, analyzeBtn);
-        setupImagePreview(fileInput);
+        setupCameraCapture();
     }
     
     // Initialize result animations if on results page
@@ -27,8 +27,9 @@ function setupFileUpload(fileInput) {
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            validateImageFile(file);
-            previewImage(file);
+            if (validateImageFile(file)) {
+                previewImage(file);
+            }
         }
     });
     
@@ -37,6 +38,30 @@ function setupFileUpload(fileInput) {
     if (fileInputContainer) {
         setupDragAndDrop(fileInputContainer, fileInput);
     }
+}
+
+function previewImage(file) {
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    
+    if (preview && previewImg) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function removePreview() {
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const fileInput = document.querySelector('input[type="file"]');
+    
+    if (preview) preview.style.display = 'none';
+    if (previewImg) previewImg.src = '';
+    if (fileInput) fileInput.value = '';
 }
 
 function validateImageFile(file) {
@@ -378,6 +403,168 @@ function getSkinTypeAdvice(skinType) {
     return advice[skinType] || advice['normal'];
 }
 
+// Camera capture functionality
+function setupCameraCapture() {
+    const cameraBtn = document.getElementById('cameraBtn');
+    const cameraModal = document.getElementById('cameraModal');
+    const video = document.getElementById('cameraVideo');
+    const canvas = document.getElementById('cameraCanvas');
+    const captureBtn = document.getElementById('captureBtn');
+    const useCapturedBtn = document.getElementById('useCapturedBtn');
+    const retakeBtn = document.getElementById('retakeBtn');
+    const fileInput = document.querySelector('input[type="file"]');
+    
+    let stream = null;
+    let capturedImageBlob = null;
+    
+    if (cameraBtn) {
+        cameraBtn.addEventListener('click', async function() {
+            try {
+                await openCamera();
+            } catch (error) {
+                showError('Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập camera.');
+                console.error('Camera access error:', error);
+            }
+        });
+    }
+    
+    if (captureBtn) {
+        captureBtn.addEventListener('click', function() {
+            capturePhoto();
+        });
+    }
+    
+    if (useCapturedBtn) {
+        useCapturedBtn.addEventListener('click', function() {
+            useCapturedPhoto();
+        });
+    }
+    
+    if (retakeBtn) {
+        retakeBtn.addEventListener('click', function() {
+            retakePhoto();
+        });
+    }
+    
+    // Close camera when modal is hidden
+    if (cameraModal) {
+        cameraModal.addEventListener('hidden.bs.modal', function() {
+            stopCamera();
+        });
+    }
+    
+    async function openCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    facingMode: 'user'
+                }
+            });
+            
+            if (video) {
+                video.srcObject = stream;
+                video.play();
+                
+                // Show modal
+                const modal = new bootstrap.Modal(cameraModal);
+                modal.show();
+                
+                // Reset UI
+                resetCameraUI();
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    function capturePhoto() {
+        if (!video || !canvas) return;
+        
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Draw video frame to canvas
+        context.drawImage(video, 0, 0);
+        
+        // Convert canvas to blob
+        canvas.toBlob(function(blob) {
+            capturedImageBlob = blob;
+            
+            // Show captured image
+            const capturedImage = document.getElementById('capturedImage');
+            if (capturedImage) {
+                capturedImage.src = canvas.toDataURL();
+                capturedImage.style.display = 'block';
+            }
+            
+            // Hide video, show captured controls
+            video.style.display = 'none';
+            captureBtn.style.display = 'none';
+            useCapturedBtn.style.display = 'inline-block';
+            retakeBtn.style.display = 'inline-block';
+            
+        }, 'image/jpeg', 0.9);
+    }
+    
+    function useCapturedPhoto() {
+        if (!capturedImageBlob || !fileInput) return;
+        
+        // Create file from blob
+        const file = new File([capturedImageBlob], 'camera-capture.jpg', {
+            type: 'image/jpeg'
+        });
+        
+        // Create FileList object
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+        
+        // Trigger change event
+        const changeEvent = new Event('change', { bubbles: true });
+        fileInput.dispatchEvent(changeEvent);
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(cameraModal);
+        modal.hide();
+        
+        showSuccess('Ảnh đã được chụp và sẵn sàng để phân tích!');
+    }
+    
+    function retakePhoto() {
+        resetCameraUI();
+        capturedImageBlob = null;
+    }
+    
+    function resetCameraUI() {
+        if (video) video.style.display = 'block';
+        if (captureBtn) captureBtn.style.display = 'inline-block';
+        if (useCapturedBtn) useCapturedBtn.style.display = 'none';
+        if (retakeBtn) retakeBtn.style.display = 'none';
+        
+        const capturedImage = document.getElementById('capturedImage');
+        if (capturedImage) {
+            capturedImage.style.display = 'none';
+        }
+    }
+    
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        
+        if (video) {
+            video.srcObject = null;
+        }
+        
+        resetCameraUI();
+        capturedImageBlob = null;
+    }
+}
+
 // Export functions for use in other modules
 window.SkinAnalysis = {
     validateImageFile,
@@ -385,5 +572,6 @@ window.SkinAnalysis = {
     removePreview,
     showError,
     showSuccess,
-    getSkinTypeAdvice
+    getSkinTypeAdvice,
+    setupCameraCapture
 };
