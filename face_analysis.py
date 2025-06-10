@@ -1,6 +1,8 @@
 import requests
 import os
 import logging
+import time
+from datetime import datetime, timedelta
 
 class FaceAnalyzer:
     def __init__(self):
@@ -8,6 +10,8 @@ class FaceAnalyzer:
         self.api_secret = os.environ.get('FACEPP_API_SECRET')
         self.detect_url = 'https://api-us.faceplusplus.com/facepp/v3/detect'
         self.skin_analyze_url = 'https://api-us.faceplusplus.com/facepp/v1/skinanalyze'
+        self.last_request_time = None
+        self.min_request_interval = 2  # 2 seconds between requests
         
     def analyze_skin(self, image_path_or_url):
         """
@@ -19,35 +23,62 @@ class FaceAnalyzer:
             return self._get_fallback_analysis()
             
         try:
-            # Use Face++ Skin Analyze API v1 for detailed skin analysis
+            # Rate limiting to prevent API errors
+            self._handle_rate_limiting()
+            
+            # Try Skin Analyze API first for detailed analysis
+            result = self._try_skin_analyze_api(image_path_or_url)
+            if result and result.get('success', False):
+                return result
+            
+            # If Skin Analyze fails, use detect API as fallback
+            logging.info("Skin Analyze API unavailable, using detect API")
+            return self._try_detect_api_fallback(image_path_or_url)
+                
+        except Exception as e:
+            logging.error(f"Error in skin analysis: {str(e)}")
+            return self._get_fallback_analysis()
+    
+    def _handle_rate_limiting(self):
+        """Handle rate limiting to prevent API errors"""
+        if self.last_request_time:
+            elapsed = time.time() - self.last_request_time
+            if elapsed < self.min_request_interval:
+                sleep_time = self.min_request_interval - elapsed
+                logging.info(f"Rate limiting: sleeping for {sleep_time:.2f} seconds")
+                time.sleep(sleep_time)
+        
+        self.last_request_time = time.time()
+    
+    def _try_skin_analyze_api(self, image_path_or_url):
+        """Try the Face++ Skin Analyze API v1"""
+        try:
             analyze_data = {
                 'api_key': self.api_key,
                 'api_secret': self.api_secret
             }
             
             response = None
-            # Check if it's a URL or file path
             if image_path_or_url.startswith('http'):
                 analyze_data['image_url'] = image_path_or_url
-                response = requests.post(self.skin_analyze_url, data=analyze_data)
+                response = requests.post(self.skin_analyze_url, data=analyze_data, timeout=10)
             else:
-                # For file uploads
                 with open(image_path_or_url, 'rb') as image_file:
                     files = {'image_file': image_file}
-                    response = requests.post(self.skin_analyze_url, data=analyze_data, files=files)
+                    response = requests.post(self.skin_analyze_url, data=analyze_data, files=files, timeout=10)
             
             if response and response.status_code == 200:
                 result = response.json()
-                logging.info(f"Face++ Skin Analyze API response: {result}")
+                logging.info(f"Face++ Skin Analyze API successful")
                 return self._process_skin_analysis_result(result)
             else:
                 error_msg = response.text if response else "No response"
-                logging.error(f"Face++ Skin Analyze API error: {response.status_code if response else 'No response'} - {error_msg}")
-                return self._get_fallback_analysis()
+                logging.warning(f"Skin Analyze API failed: {response.status_code if response else 'No response'} - {error_msg}")
+                return None
                 
         except Exception as e:
-            logging.error(f"Error in skin analysis: {str(e)}")
-            return self._get_fallback_analysis()
+            logging.warning(f"Skin Analyze API exception: {str(e)}")
+            return None
     
     def _process_skin_analysis_result(self, api_result):
         """Process Face++ Skin Analyze API v1 result into our format"""
@@ -227,6 +258,37 @@ class FaceAnalyzer:
             concerns.append('large_pores')
         
         return concerns if concerns else ['healthy_skin']
+    
+    def _try_detect_api_fallback(self, image_path_or_url):
+        """Fallback to basic detect API when Skin Analyze API fails"""
+        try:
+            logging.info("Using Face++ detect API as fallback")
+            detect_data = {
+                'api_key': self.api_key,
+                'api_secret': self.api_secret,
+                'return_attributes': 'age,gender,skinstatus,beauty'
+            }
+            
+            response = None
+            if image_path_or_url.startswith('http'):
+                detect_data['image_url'] = image_path_or_url
+                response = requests.post(self.detect_url, data=detect_data)
+            else:
+                with open(image_path_or_url, 'rb') as image_file:
+                    files = {'image_file': image_file}
+                    response = requests.post(self.detect_url, data=detect_data, files=files)
+            
+            if response and response.status_code == 200:
+                result = response.json()
+                logging.info(f"Face++ detect API fallback response: {result}")
+                return self._process_analysis_result(result)
+            else:
+                logging.error(f"Detect API fallback also failed: {response.status_code if response else 'No response'}")
+                return self._get_fallback_analysis()
+                
+        except Exception as e:
+            logging.error(f"Error in detect API fallback: {str(e)}")
+            return self._get_fallback_analysis()
     
     def _identify_concerns(self, skin_status):
         """Identify skin concerns from analysis"""
