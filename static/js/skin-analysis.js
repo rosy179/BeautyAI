@@ -419,13 +419,34 @@ function setupCameraCapture() {
     
     if (cameraBtn) {
         cameraBtn.addEventListener('click', async function() {
+            console.log('Camera button clicked');
             try {
                 await openCamera();
             } catch (error) {
-                showError('Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập camera.');
                 console.error('Camera access error:', error);
+                let errorMessage = 'Không thể truy cập camera. ';
+                
+                if (error.name === 'NotAllowedError') {
+                    errorMessage += 'Vui lòng cho phép truy cập camera trong trình duyệt.';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage += 'Không tìm thấy camera trên thiết bị.';
+                } else if (error.name === 'NotSupportedError') {
+                    errorMessage += 'Trình duyệt không hỗ trợ camera.';
+                } else {
+                    errorMessage += 'Vui lòng thử lại hoặc sử dụng tính năng tải ảnh lên.';
+                }
+                
+                showError(errorMessage);
+                
+                // Close modal if it was opened
+                const modal = bootstrap.Modal.getInstance(cameraModal);
+                if (modal) {
+                    modal.hide();
+                }
             }
         });
+    } else {
+        console.log('Camera button not found');
     }
     
     if (captureBtn) {
@@ -455,6 +476,18 @@ function setupCameraCapture() {
     
     async function openCamera() {
         try {
+            // Update status
+            updateCameraStatus('Đang yêu cầu quyền truy cập camera...', 'warning');
+            
+            // Show modal first
+            const modal = new bootstrap.Modal(cameraModal);
+            modal.show();
+            
+            // Check if camera is available
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error('Trình duyệt không hỗ trợ camera');
+            }
+            
             stream = await navigator.mediaDevices.getUserMedia({
                 video: {
                     width: { ideal: 1280 },
@@ -465,17 +498,25 @@ function setupCameraCapture() {
             
             if (video) {
                 video.srcObject = stream;
-                video.play();
+                await video.play();
                 
-                // Show modal
-                const modal = new bootstrap.Modal(cameraModal);
-                modal.show();
+                // Update status
+                updateCameraStatus('Camera đã sẵn sàng!', 'success');
                 
                 // Reset UI
                 resetCameraUI();
             }
         } catch (error) {
+            updateCameraStatus('Lỗi: ' + error.message, 'danger');
             throw error;
+        }
+    }
+    
+    function updateCameraStatus(message, type) {
+        const statusEl = document.getElementById('cameraStatus');
+        if (statusEl) {
+            statusEl.className = `badge bg-${type}`;
+            statusEl.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : type === 'danger' ? 'times' : 'clock'} me-1"></i>${message}`;
         }
     }
     
@@ -565,6 +606,24 @@ function setupCameraCapture() {
     }
 }
 
+// Test function for camera feature
+function testCameraFeature() {
+    console.log('Testing camera feature...');
+    
+    // Check if camera elements exist
+    const cameraBtn = document.getElementById('cameraBtn');
+    const cameraModal = document.getElementById('cameraModal');
+    
+    if (cameraBtn && cameraModal) {
+        console.log('Camera elements found, triggering camera...');
+        showSuccess('Đang khởi động camera để test...');
+        cameraBtn.click();
+    } else {
+        console.error('Camera elements not found');
+        showError('Không tìm thấy các thành phần camera. Vui lòng tải lại trang.');
+    }
+}
+
 // Export functions for use in other modules
 window.SkinAnalysis = {
     validateImageFile,
@@ -575,3 +634,6 @@ window.SkinAnalysis = {
     getSkinTypeAdvice,
     setupCameraCapture
 };
+
+// Make test function globally available
+window.testCameraFeature = testCameraFeature;

@@ -20,7 +20,9 @@
                     </p>
                     {% endif %}
                     <small class="text-muted">
+                        {% if current_user.date_joined %}
                         Thành viên từ {{ current_user.date_joined.strftime('%m/%Y') }}
+                        {% endif %}
                     </small>
                 </div>
             </div>

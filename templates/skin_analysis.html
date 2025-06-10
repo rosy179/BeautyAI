@@ -27,17 +27,24 @@
                             
                             <!-- Image upload options -->
                             <div class="upload-options mb-3">
-                                <div class="row g-2">
-                                    <div class="col-6">
-                                        <label for="{{ form.skin_image.id }}" class="btn btn-outline-primary w-100">
-                                            <i class="fas fa-upload me-2"></i>Tải ảnh lên
-                                        </label>
+                                <div class="alert alert-info mb-3">
+                                    <h6><i class="fas fa-info-circle me-2"></i>Chọn cách tải ảnh:</h6>
+                                    <div class="row g-2 mt-2">
+                                        <div class="col-md-6">
+                                            <label for="{{ form.skin_image.id }}" class="btn btn-primary w-100 btn-lg">
+                                                <i class="fas fa-upload me-2"></i>Tải ảnh từ thiết bị
+                                            </label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-success w-100 btn-lg" id="cameraBtn">
+                                                <i class="fas fa-camera me-2"></i>Chụp ảnh trực tiếp
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="col-6">
-                                        <button type="button" class="btn btn-outline-success w-100" id="cameraBtn">
-                                            <i class="fas fa-camera me-2"></i>Chụp ảnh
-                                        </button>
-                                    </div>
+                                    <small class="d-block mt-2 text-muted">
+                                        <i class="fas fa-lightbulb me-1"></i>
+                                        <strong>Khuyên dùng:</strong> Chụp ảnh trực tiếp để có chất lượng tốt nhất
+                                    </small>
                                 </div>
                             </div>
                             
@@ -81,6 +88,28 @@
                             {{ form.skin_concerns(class="form-select") }}
                         </div>
                         
+                        <!-- Demo and Testing Section -->
+                        <div class="demo-section mb-4 p-3 bg-warning bg-opacity-10 rounded border border-warning">
+                            <h6><i class="fas fa-play me-2 text-warning"></i>Hướng dẫn sử dụng chức năng chụp ảnh:</h6>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <ol class="mb-0">
+                                        <li><strong>Nhấn nút "Chụp ảnh trực tiếp"</strong> ở trên</li>
+                                        <li><strong>Cho phép truy cập camera</strong> khi trình duyệt hỏi</li>
+                                        <li><strong>Đặt khuôn mặt vào khung tròn</strong> trong màn hình camera</li>
+                                        <li><strong>Nhấn "Chụp ảnh"</strong> khi đã sẵn sàng</li>
+                                        <li><strong>Xem trước và xác nhận</strong> ảnh vừa chụp</li>
+                                    </ol>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="testCameraFeature()">
+                                        <i class="fas fa-camera me-1"></i>Test Camera
+                                    </button>
+                                    <br><small class="text-muted">Kiểm tra tính năng</small>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="analysis-tips mb-4 p-3 bg-light rounded">
                             <h6><i class="fas fa-lightbulb me-2 text-warning"></i>Để có kết quả tốt nhất:</h6>
                             <ul class="mb-0">
@@ -261,15 +290,26 @@
             <div class="modal-body text-center">
                 <!-- Camera instructions -->
                 <div class="camera-instructions mb-3">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Hướng dẫn chụp ảnh:</strong>
-                        <ul class="mb-0 mt-2 text-start">
-                            <li>Đặt khuôn mặt vào khung hình</li>
-                            <li>Đảm bảo ánh sáng đủ và đều</li>
-                            <li>Nhìn thẳng vào camera</li>
-                            <li>Không trang điểm để có kết quả chính xác</li>
-                        </ul>
+                    <div class="alert alert-success">
+                        <i class="fas fa-camera me-2"></i>
+                        <strong>Hướng dẫn chụp ảnh khuôn mặt:</strong>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <ul class="mb-0 text-start">
+                                    <li>Đặt khuôn mặt vào khung hình tròn</li>
+                                    <li>Đảm bảo ánh sáng đủ và đều</li>
+                                    <li>Nhìn thẳng vào camera</li>
+                                    <li>Không trang điểm để có kết quả chính xác</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <div id="cameraStatus" class="badge bg-warning">
+                                        <i class="fas fa-clock me-1"></i>Đang khởi động camera...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
