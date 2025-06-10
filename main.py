@@ -1,68 +1,42 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
+import logging
 
-# Set environment variable
-os.environ.setdefault('FLASK_SECRET_KEY', 'beauty-analytics-secret-key-2024')
-
-class Base(DeclarativeBase):
-    pass
-
-db = SQLAlchemy(model_class=Base)
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # Create Flask app
 app = Flask(__name__)
-app.secret_key = os.environ.get('FLASK_SECRET_KEY')
-
-# Configure database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URL')
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-    "connect_args": {"sslmode": "require"}
-}
-
-db.init_app(app)
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'beauty-analytics-secret-key-2024')
 
 # Setup login manager
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# Models
-class User(UserMixin, db.Model):
-    __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256))
-    full_name = db.Column(db.String(100))
-    is_admin = db.Column(db.Boolean, default=False)
-    date_joined = db.Column(db.DateTime, default=datetime.utcnow)
+# Import database after app creation to avoid circular imports
+try:
+    from database import db, User, Product, Category, SkinAnalysis
+    db.init_app(app)
+    logger.info("Database models imported successfully")
+except Exception as e:
+    logger.error(f"Database import failed: {e}")
+    # Fallback - create minimal in-memory storage
+    users = {}
+    products = []
 
-class Category(db.Model):
-    __tablename__ = 'category'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text)
-
-class Product(db.Model):
-    __tablename__ = 'product'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    brand = db.Column(db.String(100))
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    stock_quantity = db.Column(db.Integer, default=0)
+# Models are imported from database.py to avoid conflicts
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    try:
+        return db.session.get(User, int(user_id))
+    except:
+        return None
 
 # Routes
 @app.route('/')

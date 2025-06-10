@@ -77,7 +77,7 @@
                     
                     <!-- Continue Shopping -->
                     <div class="mt-3">
-                        <a href="{{ url_for('products.index') }}" class="btn btn-outline-primary">
+                        <a href="{{ url_for('products') }}" class="btn btn-outline-primary">
                             <i class="fas fa-arrow-left me-2"></i>Tiếp tục mua sắm
                         </a>
                     </div>
@@ -106,18 +106,18 @@
                             
                             {% if current_user.is_authenticated %}
                             <div class="d-grid">
-                                <a href="{{ url_for('main.checkout') }}" class="btn btn-primary btn-lg">
+                                <a href="{{ url_for('skin_analysischeckout') }}" class="btn btn-primary btn-lg">
                                     <i class="fas fa-credit-card me-2"></i>Thanh toán
                                 </a>
                             </div>
                             {% else %}
                             <div class="d-grid mb-2">
-                                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
+                                <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">
                                     <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập để thanh toán
                                 </a>
                             </div>
                             <div class="d-grid">
-                                <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary">
+                                <a href="{{ url_for('login') }}" class="btn btn-outline-primary">
                                     <i class="fas fa-user-plus me-2"></i>Đăng ký tài khoản
                                 </a>
                             </div>
@@ -146,7 +146,7 @@
                 <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
                 <h3>Giỏ hàng của bạn đang trống</h3>
                 <p class="text-muted mb-4">Hãy khám phá những sản phẩm tuyệt vời của chúng tôi!</p>
-                <a href="{{ url_for('products.index') }}" class="btn btn-primary btn-lg">
+                <a href="{{ url_for('products') }}" class="btn btn-primary btn-lg">
                     <i class="fas fa-shopping-bag me-2"></i>Khám phá sản phẩm
                 </a>
             </div>

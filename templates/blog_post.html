@@ -71,7 +71,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save me-2"></i>Lưu bài viết
                             </button>
-                            <a href="{{ url_for('blog.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ url_for('blog') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-times me-2"></i>Hủy
                             </a>
                         </div>
@@ -89,8 +89,8 @@
                 <!-- Breadcrumb -->
                 <nav aria-label="breadcrumb" class="mb-4">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Trang chủ</a></li>
-                        <li class="breadcrumb-item"><a href="{{ url_for('blog.index') }}">Blog</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('blog') }}">Blog</a></li>
                         <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
                     </ol>
                 </nav>
@@ -187,7 +187,7 @@
                     {% else %}
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
-                        <a href="{{ url_for('auth.login') }}">Đăng nhập</a> để bình luận về bài viết này.
+                        <a href="{{ url_for('login') }}">Đăng nhập</a> để bình luận về bài viết này.
                     </div>
                     {% endif %}
                     
