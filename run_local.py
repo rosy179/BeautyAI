@@ -18,7 +18,7 @@ except ImportError:
 
 if __name__ == '__main__':
     try:
-        from app import app
+        from app import app, init_app
         
         # Development configuration
         app.config['DEBUG'] = True
@@ -34,6 +34,9 @@ if __name__ == '__main__':
                 print(f"  - {var}")
             print("\nPlease check your .env file configuration")
             sys.exit(1)
+        
+        # Initialize the app with models and routes
+        init_app()
         
         # Run the application
         print("Starting Beauty Analytics development server...")
