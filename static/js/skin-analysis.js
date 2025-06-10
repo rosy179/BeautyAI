@@ -609,10 +609,18 @@ function setupCameraCapture() {
 // Test function for camera feature
 function testCameraFeature() {
     console.log('Testing camera feature...');
+    console.log('Looking for elements...');
+    
+    // Debug element search
+    const allElements = document.querySelectorAll('*[id]');
+    console.log('All elements with IDs:', Array.from(allElements).map(el => el.id));
     
     // Check if camera elements exist
     const cameraBtn = document.getElementById('cameraBtn');
     const cameraModal = document.getElementById('cameraModal');
+    
+    console.log('Camera button:', cameraBtn);
+    console.log('Camera modal:', cameraModal);
     
     if (cameraBtn && cameraModal) {
         console.log('Camera elements found, triggering camera...');
@@ -620,8 +628,56 @@ function testCameraFeature() {
         cameraBtn.click();
     } else {
         console.error('Camera elements not found');
-        showError('Không tìm thấy các thành phần camera. Vui lòng tải lại trang.');
+        console.log('Available buttons:', document.querySelectorAll('button'));
+        console.log('Available modals:', document.querySelectorAll('.modal'));
+        showError('Không tìm thấy các thành phần camera. Đang kiểm tra lại...');
+        
+        // Try to create a simple camera interface
+        createSimpleCameraInterface();
     }
+}
+
+function createSimpleCameraInterface() {
+    // Create a basic camera modal if the original one is missing
+    const existingModal = document.getElementById('cameraModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    const modalHTML = `
+        <div class="modal fade" id="cameraModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Chụp ảnh khuôn mặt</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <div class="alert alert-info mb-3">
+                            <strong>Hướng dẫn:</strong> Đặt khuôn mặt vào khung camera và nhấn chụp
+                        </div>
+                        <video id="cameraVideo" autoplay muted class="img-fluid rounded" style="max-width: 100%; height: 300px; background: #000;"></video>
+                        <canvas id="cameraCanvas" style="display: none;"></canvas>
+                        <img id="capturedImage" class="img-fluid rounded" style="max-width: 100%; height: 300px; display: none;">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" id="captureBtn">Chụp ảnh</button>
+                        <button type="button" class="btn btn-primary" id="useCapturedBtn" style="display: none;">Sử dụng ảnh</button>
+                        <button type="button" class="btn btn-secondary" id="retakeBtn" style="display: none;">Chụp lại</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Re-setup camera functionality
+    setupCameraCapture();
+    
+    // Try to open camera
+    const modal = new bootstrap.Modal(document.getElementById('cameraModal'));
+    modal.show();
 }
 
 // Export functions for use in other modules

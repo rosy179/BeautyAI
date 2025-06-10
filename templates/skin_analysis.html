@@ -272,76 +272,76 @@
             </div>
             {% endif %}
             {% endif %}
+            
+            <!-- Camera Modal -->
+            <div class="modal fade" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="cameraModalLabel">
+                                <i class="fas fa-camera me-2"></i>Chụp ảnh khuôn mặt
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <!-- Camera instructions -->
+                            <div class="camera-instructions mb-3">
+                                <div class="alert alert-success">
+                                    <i class="fas fa-camera me-2"></i>
+                                    <strong>Hướng dẫn chụp ảnh khuôn mặt:</strong>
+                                    <div class="row mt-2">
+                                        <div class="col-md-6">
+                                            <ul class="mb-0 text-start">
+                                                <li>Đặt khuôn mặt vào khung hình tròn</li>
+                                                <li>Đảm bảo ánh sáng đủ và đều</li>
+                                                <li>Nhìn thẳng vào camera</li>
+                                                <li>Không trang điểm để có kết quả chính xác</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="text-center">
+                                                <div id="cameraStatus" class="badge bg-warning">
+                                                    <i class="fas fa-clock me-1"></i>Đang khởi động camera...
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Camera video -->
+                            <div class="camera-container position-relative">
+                                <video id="cameraVideo" autoplay muted class="img-fluid rounded" style="max-width: 100%; max-height: 400px;"></video>
+                                <canvas id="cameraCanvas" style="display: none;"></canvas>
+                                
+                                <!-- Captured image preview -->
+                                <img id="capturedImage" class="img-fluid rounded" style="max-width: 100%; max-height: 400px; display: none;" alt="Captured photo">
+                                
+                                <!-- Face detection overlay -->
+                                <div class="face-overlay position-absolute top-50 start-50 translate-middle" style="border: 2px dashed #28a745; width: 250px; height: 300px; border-radius: 50%;"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <!-- Camera controls -->
+                            <button type="button" class="btn btn-success btn-lg" id="captureBtn">
+                                <i class="fas fa-camera me-2"></i>Chụp ảnh
+                            </button>
+                            
+                            <!-- Captured photo controls -->
+                            <button type="button" class="btn btn-primary btn-lg" id="useCapturedBtn" style="display: none;">
+                                <i class="fas fa-check me-2"></i>Sử dụng ảnh này
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="retakeBtn" style="display: none;">
+                                <i class="fas fa-redo me-2"></i>Chụp lại
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
-
-<!-- Camera Modal -->
-<div class="modal fade" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="cameraModalLabel">
-                    <i class="fas fa-camera me-2"></i>Chụp ảnh khuôn mặt
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <!-- Camera instructions -->
-                <div class="camera-instructions mb-3">
-                    <div class="alert alert-success">
-                        <i class="fas fa-camera me-2"></i>
-                        <strong>Hướng dẫn chụp ảnh khuôn mặt:</strong>
-                        <div class="row mt-2">
-                            <div class="col-md-6">
-                                <ul class="mb-0 text-start">
-                                    <li>Đặt khuôn mặt vào khung hình tròn</li>
-                                    <li>Đảm bảo ánh sáng đủ và đều</li>
-                                    <li>Nhìn thẳng vào camera</li>
-                                    <li>Không trang điểm để có kết quả chính xác</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="text-center">
-                                    <div id="cameraStatus" class="badge bg-warning">
-                                        <i class="fas fa-clock me-1"></i>Đang khởi động camera...
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Camera video -->
-                <div class="camera-container position-relative">
-                    <video id="cameraVideo" autoplay muted class="img-fluid rounded" style="max-width: 100%; max-height: 400px;"></video>
-                    <canvas id="cameraCanvas" style="display: none;"></canvas>
-                    
-                    <!-- Captured image preview -->
-                    <img id="capturedImage" class="img-fluid rounded" style="max-width: 100%; max-height: 400px; display: none;" alt="Captured photo">
-                    
-                    <!-- Face detection overlay -->
-                    <div class="face-overlay position-absolute top-50 start-50 translate-middle" style="border: 2px dashed #28a745; width: 250px; height: 300px; border-radius: 50%;"></div>
-                </div>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <!-- Camera controls -->
-                <button type="button" class="btn btn-success btn-lg" id="captureBtn">
-                    <i class="fas fa-camera me-2"></i>Chụp ảnh
-                </button>
-                
-                <!-- Captured photo controls -->
-                <button type="button" class="btn btn-primary btn-lg" id="useCapturedBtn" style="display: none;">
-                    <i class="fas fa-check me-2"></i>Sử dụng ảnh này
-                </button>
-                <button type="button" class="btn btn-outline-secondary" id="retakeBtn" style="display: none;">
-                    <i class="fas fa-redo me-2"></i>Chụp lại
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/skin-analysis.js') }}"></script>
