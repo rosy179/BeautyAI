@@ -30,7 +30,17 @@ source venv/bin/activate
 pip install -r dependencies.txt
 ```
 
-### Bước 2: Cài đặt PostgreSQL
+### Bước 2: Chọn Database (2 tùy chọn)
+
+#### Tùy chọn A: Supabase (Khuyên dùng - Miễn phí, Cloud)
+1. Đăng ký tại: https://supabase.com
+2. Tạo project mới với tên "Beauty Analytics"
+3. Chọn region Singapore (gần Việt Nam)
+4. Tạo password mạnh cho database
+5. Copy connection string từ Settings → Database
+6. Xem chi tiết trong file `SUPABASE_SETUP.md`
+
+#### Tùy chọn B: PostgreSQL Local
 **Windows:**
 - Tải PostgreSQL từ: https://www.postgresql.org/download/windows/
 - Chạy installer và nhớ mật khẩu postgres
@@ -48,15 +58,21 @@ sudo apt install postgresql postgresql-contrib
 sudo service postgresql start
 ```
 
-### Bước 3: Tạo Database
+### Bước 3: Cấu hình Database Connection
+
+#### Với Supabase:
 ```bash
-# Tạo database mới
+# Trong file .env, sử dụng connection string từ Supabase:
+DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+```
+
+#### Với PostgreSQL Local:
+```bash
+# Tạo database local
 createdb beauty_app
 
-# Hoặc qua psql:
-psql -U postgres
-CREATE DATABASE beauty_app;
-\q
+# Trong file .env:
+DATABASE_URL=postgresql://postgres:your_password@localhost:5432/beauty_app
 ```
 
 ### Bước 4: Cấu hình môi trường
@@ -70,12 +86,15 @@ nano .env       # Linux/macOS
 ```
 
 **Cập nhật thông tin trong .env:**
+
+#### Với Supabase Database:
 ```bash
-# Database - thay đổi password theo PostgreSQL của bạn
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/beauty_app
+# Supabase Database - thay [YOUR-PASSWORD] và [PROJECT-REF] bằng thông tin từ Supabase
+DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
+PGHOST=db.[PROJECT-REF].supabase.co
 PGUSER=postgres
-PGPASSWORD=YOUR_PASSWORD
-PGDATABASE=beauty_app
+PGPASSWORD=[YOUR-PASSWORD]
+PGDATABASE=postgres
 
 # Flask secrets - tạo mật khẩu mạnh
 FLASK_SECRET_KEY=your-super-secret-key-here
@@ -87,6 +106,18 @@ FACEPP_API_SECRET=your_api_secret
 
 # Stripe (tùy chọn)
 STRIPE_SECRET_KEY=sk_test_your_key
+```
+
+#### Với PostgreSQL Local:
+```bash
+# Local Database - thay YOUR_PASSWORD bằng password PostgreSQL của bạn
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/beauty_app
+PGHOST=localhost
+PGUSER=postgres
+PGPASSWORD=YOUR_PASSWORD
+PGDATABASE=beauty_app
+
+# Các phần khác giống như trên...
 ```
 
 ### Bước 5: Khởi tạo Database
