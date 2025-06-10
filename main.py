@@ -139,7 +139,7 @@ def internal_error(error):
     print(f"Internal server error: {error}")
     return render_template('500.html'), 500
 
-# Initialize database in app context
+# Initialize database in app context (only when not running under Gunicorn)
 def init_database():
     with app.app_context():
         try:
@@ -148,8 +148,10 @@ def init_database():
         except Exception as e:
             print(f"Database initialization warning: {e}")
 
-# Initialize database
-init_database()
+# Only initialize database if not running under Gunicorn
+import os
+if not os.environ.get('SERVER_SOFTWARE', '').startswith('gunicorn'):
+    init_database()
 
 # Expose app for Gunicorn
 application = app
