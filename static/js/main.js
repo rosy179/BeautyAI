@@ -1,6 +1,54 @@
 // Beauty App Main JavaScript Module
 // Handles global functionality and interactions
 
+// Utility functions defined first
+function createToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    toast.innerHTML = `
+        <div class="toast-content">
+            <i class="fas fa-${getToastIcon(type)} me-2"></i>
+            <span>${message}</span>
+        </div>
+        <button type="button" class="toast-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    return toast;
+}
+
+function getToastIcon(type) {
+    const icons = {
+        success: 'check-circle',
+        error: 'exclamation-triangle',
+        warning: 'exclamation-triangle',
+        info: 'info-circle'
+    };
+    return icons[type] || 'info-circle';
+}
+
+// Define showToast globally before DOM loads
+window.showToast = function(message, type = 'info') {
+    const toast = createToast(message, type);
+    document.body.appendChild(toast);
+    
+    // Show toast
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+    
+    // Auto-dismiss
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 300);
+    }, 4000);
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
 });
@@ -202,26 +250,7 @@ function initializeNotifications() {
         }, 5000);
     });
     
-    // Toast notifications
-    window.showToast = function(message, type = 'info') {
-        const toast = createToast(message, type);
-        document.body.appendChild(toast);
-        
-        // Show toast
-        setTimeout(() => {
-            toast.classList.add('show');
-        }, 100);
-        
-        // Auto-dismiss
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.remove();
-                }
-            }, 300);
-        }, 4000);
-    };
+    // Toast notifications are now handled by global showToast function
 }
 
 // Product interactions
@@ -404,32 +433,6 @@ function formatPhoneNumber(input) {
 function autoResizeTextarea(textarea) {
     textarea.style.height = 'auto';
     textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
-}
-
-function createToast(message, type) {
-    const toast = document.createElement('div');
-    toast.className = `toast-notification toast-${type}`;
-    toast.innerHTML = `
-        <div class="toast-content">
-            <i class="fas fa-${getToastIcon(type)} me-2"></i>
-            <span>${message}</span>
-        </div>
-        <button type="button" class="toast-close" onclick="this.parentElement.remove()">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    return toast;
-}
-
-function getToastIcon(type) {
-    const icons = {
-        success: 'check-circle',
-        error: 'exclamation-triangle',
-        warning: 'exclamation-triangle',
-        info: 'info-circle'
-    };
-    return icons[type] || 'info-circle';
 }
 
 function showImageModal(src, alt) {
