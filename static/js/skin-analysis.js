@@ -616,7 +616,7 @@ function testCameraFeature() {
     console.log('All elements with IDs:', Array.from(allElements).map(el => el.id));
     
     // Check if camera elements exist
-    const cameraBtn = document.getElementById('cameraBtn');
+    const cameraBtn = document.getElementById('cameraButton');
     const cameraModal = document.getElementById('cameraModal');
     
     console.log('Camera button:', cameraBtn);

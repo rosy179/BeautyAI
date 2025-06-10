@@ -4,8 +4,8 @@ import logging
 
 class FaceAnalyzer:
     def __init__(self):
-        self.api_key = os.environ.get('FACEPLUS_API_KEY')
-        self.api_secret = os.environ.get('FACEPLUS_API_SECRET')
+        self.api_key = os.environ.get('FACEPP_API_KEY')
+        self.api_secret = os.environ.get('FACEPP_API_SECRET')
         self.detect_url = 'https://api-us.faceplusplus.com/facepp/v3/detect'
         self.analyze_url = 'https://api-us.faceplusplus.com/facepp/v3/face/analyze'
         
@@ -26,22 +26,24 @@ class FaceAnalyzer:
                 'return_attributes': 'age,gender,skinstatus,beauty'
             }
             
+            response = None
             # Check if it's a URL or file path
             if image_path_or_url.startswith('http'):
                 detect_data['image_url'] = image_path_or_url
+                response = requests.post(self.detect_url, data=detect_data)
             else:
+                # For file uploads
                 with open(image_path_or_url, 'rb') as image_file:
                     files = {'image_file': image_file}
                     response = requests.post(self.detect_url, data=detect_data, files=files)
             
-            if image_path_or_url.startswith('http'):
-                response = requests.post(self.detect_url, data=detect_data)
-            
-            if response.status_code == 200:
+            if response and response.status_code == 200:
                 result = response.json()
+                logging.info(f"Face++ API response: {result}")
                 return self._process_analysis_result(result)
             else:
-                logging.error(f"Face++ API error: {response.status_code} - {response.text}")
+                error_msg = response.text if response else "No response"
+                logging.error(f"Face++ API error: {response.status_code if response else 'No response'} - {error_msg}")
                 return self._get_fallback_analysis()
                 
         except Exception as e:
