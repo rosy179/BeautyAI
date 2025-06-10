@@ -139,13 +139,20 @@ def internal_error(error):
     print(f"Internal server error: {error}")
     return render_template('500.html'), 500
 
-# Create tables on startup
-with app.app_context():
-    try:
-        db.create_all()
-        print("Database tables initialized successfully")
-    except Exception as e:
-        print(f"Database initialization warning: {e}")
+# Initialize database in app context
+def init_database():
+    with app.app_context():
+        try:
+            db.create_all()
+            print("Database tables initialized successfully")
+        except Exception as e:
+            print(f"Database initialization warning: {e}")
+
+# Initialize database
+init_database()
+
+# Expose app for Gunicorn
+application = app
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
