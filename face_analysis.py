@@ -7,7 +7,7 @@ class FaceAnalyzer:
         self.api_key = os.environ.get('FACEPP_API_KEY')
         self.api_secret = os.environ.get('FACEPP_API_SECRET')
         self.detect_url = 'https://api-us.faceplusplus.com/facepp/v3/detect'
-        self.analyze_url = 'https://api-us.faceplusplus.com/facepp/v3/face/analyze'
+        self.skin_analyze_url = 'https://api-us.faceplusplus.com/facepp/v1/skinanalyze'
         
     def analyze_skin(self, image_path_or_url):
         """
@@ -19,36 +19,69 @@ class FaceAnalyzer:
             return self._get_fallback_analysis()
             
         try:
-            # First, detect face in the image
-            detect_data = {
+            # Use Face++ Skin Analyze API v1 for detailed skin analysis
+            analyze_data = {
                 'api_key': self.api_key,
-                'api_secret': self.api_secret,
-                'return_attributes': 'age,gender,skinstatus,beauty'
+                'api_secret': self.api_secret
             }
             
             response = None
             # Check if it's a URL or file path
             if image_path_or_url.startswith('http'):
-                detect_data['image_url'] = image_path_or_url
-                response = requests.post(self.detect_url, data=detect_data)
+                analyze_data['image_url'] = image_path_or_url
+                response = requests.post(self.skin_analyze_url, data=analyze_data)
             else:
                 # For file uploads
                 with open(image_path_or_url, 'rb') as image_file:
                     files = {'image_file': image_file}
-                    response = requests.post(self.detect_url, data=detect_data, files=files)
+                    response = requests.post(self.skin_analyze_url, data=analyze_data, files=files)
             
             if response and response.status_code == 200:
                 result = response.json()
-                logging.info(f"Face++ API response: {result}")
-                return self._process_analysis_result(result)
+                logging.info(f"Face++ Skin Analyze API response: {result}")
+                return self._process_skin_analysis_result(result)
             else:
                 error_msg = response.text if response else "No response"
-                logging.error(f"Face++ API error: {response.status_code if response else 'No response'} - {error_msg}")
+                logging.error(f"Face++ Skin Analyze API error: {response.status_code if response else 'No response'} - {error_msg}")
                 return self._get_fallback_analysis()
                 
         except Exception as e:
             logging.error(f"Error in skin analysis: {str(e)}")
             return self._get_fallback_analysis()
+    
+    def _process_skin_analysis_result(self, api_result):
+        """Process Face++ Skin Analyze API v1 result into our format"""
+        if not api_result.get('result'):
+            return self._get_fallback_analysis()
+        
+        result = api_result['result']
+        
+        # Extract detailed skin analysis from v1 API
+        skin_type_data = result.get('skin_type', {})
+        skin_problems = result.get('skin_problem', {})
+        skin_age = result.get('skin_age', {}).get('value', 25)
+        
+        # Handle the nested structure of skin_type
+        skin_type_score = skin_type_data.get('skin_type', {}) if 'skin_type' in skin_type_data else skin_type_data
+        
+        # Determine skin type from detailed analysis
+        skin_type = self._determine_skin_type_v1(skin_type_score)
+        
+        # Identify skin concerns from detailed problems analysis
+        concerns = self._identify_concerns_v1(skin_problems)
+        
+        # Generate skincare routine recommendations
+        routine = self._generate_routine(skin_type, concerns, skin_age)
+        
+        return {
+            'success': True,
+            'skin_type': skin_type,
+            'age': skin_age,
+            'concerns': concerns,
+            'skin_analysis': result,
+            'recommended_routine': routine,
+            'confidence': api_result.get('confidence', 0.8)
+        }
     
     def _process_analysis_result(self, api_result):
         """Process Face++ API result into our format"""
@@ -101,6 +134,61 @@ class FaceAnalyzer:
             return 'combination'
         else:
             return 'sensitive'
+    
+    def _determine_skin_type_v1(self, skin_type_score):
+        """Determine skin type from Face++ Skin Analyze API v1"""
+        if not skin_type_score:
+            return 'normal'
+        
+        # Face++ v1 provides detailed skin type scores
+        oily_score = skin_type_score.get('oily', 0)
+        dry_score = skin_type_score.get('dry', 0)
+        neutral_score = skin_type_score.get('neutral', 0)
+        
+        # Find the highest scoring skin type
+        scores = {
+            'oily': oily_score,
+            'dry': dry_score,
+            'normal': neutral_score
+        }
+        
+        skin_type = max(scores.keys(), key=lambda k: scores[k])
+        
+        # If scores are close, classify as combination
+        if abs(oily_score - dry_score) < 20 and max(oily_score, dry_score) > neutral_score:
+            return 'combination'
+        
+        return skin_type
+    
+    def _identify_concerns_v1(self, skin_problems):
+        """Identify skin concerns from Face++ Skin Analyze API v1"""
+        concerns = []
+        
+        if not skin_problems:
+            return concerns
+        
+        # Face++ v1 provides detailed problem analysis
+        acne_score = skin_problems.get('acne_spot', {}).get('value', 0)
+        blackhead_score = skin_problems.get('blackhead', {}).get('value', 0)
+        wrinkle_score = skin_problems.get('wrinkle', {}).get('value', 0)
+        stain_score = skin_problems.get('stain', {}).get('value', 0)
+        dark_circle_score = skin_problems.get('dark_circle', {}).get('value', 0)
+        
+        # Threshold for concern identification
+        threshold = 30
+        
+        if acne_score > threshold:
+            concerns.append('acne')
+        if blackhead_score > threshold:
+            concerns.append('blackheads')
+        if wrinkle_score > threshold:
+            concerns.append('wrinkles')
+        if stain_score > threshold:
+            concerns.append('dark_spots')
+        if dark_circle_score > threshold:
+            concerns.append('dark_circles')
+        
+        return concerns
     
     def _identify_concerns(self, skin_status):
         """Identify skin concerns from analysis"""
