@@ -58,17 +58,19 @@ class FaceAnalyzer:
         
         # Extract detailed skin analysis from v1 API
         skin_type_data = result.get('skin_type', {})
-        skin_problems = result.get('skin_problem', {})
-        skin_age = result.get('skin_age', {}).get('value', 25)
         
-        # Handle the nested structure of skin_type
-        skin_type_score = skin_type_data.get('skin_type', {}) if 'skin_type' in skin_type_data else skin_type_data
+        # Determine skin type from the API response
+        if isinstance(skin_type_data, dict) and 'skin_type' in skin_type_data:
+            skin_type_value = skin_type_data['skin_type']
+            skin_type = self._map_skin_type_number(skin_type_value)
+        else:
+            skin_type = 'normal'
         
-        # Determine skin type from detailed analysis
-        skin_type = self._determine_skin_type_v1(skin_type_score)
+        # Extract age estimate (fallback to 25 if not available)
+        skin_age = 25
         
-        # Identify skin concerns from detailed problems analysis
-        concerns = self._identify_concerns_v1(skin_problems)
+        # Identify skin concerns from the detailed analysis
+        concerns = self._identify_concerns_from_analysis(result)
         
         # Generate skincare routine recommendations
         routine = self._generate_routine(skin_type, concerns, skin_age)
@@ -195,6 +197,36 @@ class FaceAnalyzer:
             concerns.append('dark_circles')
         
         return concerns
+    
+    def _map_skin_type_number(self, skin_type_value):
+        """Map Face++ skin type number to readable type"""
+        skin_type_map = {
+            0: 'dry',
+            1: 'oily', 
+            2: 'normal',
+            3: 'combination'
+        }
+        return skin_type_map.get(skin_type_value, 'normal')
+    
+    def _identify_concerns_from_analysis(self, result):
+        """Identify skin concerns from Face++ Skin Analyze API v1 detailed results"""
+        concerns = []
+        
+        # Check specific skin issues from the detailed analysis
+        if result.get('acne', {}).get('value', 0) > 0:
+            concerns.append('acne')
+        if result.get('blackhead', {}).get('value', 0) > 0:
+            concerns.append('blackheads')
+        if result.get('dark_circle', {}).get('value', 0) > 0:
+            concerns.append('dark_circles')
+        if result.get('skin_spot', {}).get('value', 0) > 0:
+            concerns.append('dark_spots')
+        if result.get('forehead_wrinkle', {}).get('value', 0) > 0 or result.get('eye_finelines', {}).get('value', 0) > 0:
+            concerns.append('wrinkles')
+        if result.get('pores_left_cheek', {}).get('value', 0) > 0 or result.get('pores_right_cheek', {}).get('value', 0) > 0:
+            concerns.append('large_pores')
+        
+        return concerns if concerns else ['healthy_skin']
     
     def _identify_concerns(self, skin_status):
         """Identify skin concerns from analysis"""
