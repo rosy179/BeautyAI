@@ -23,8 +23,8 @@
             <div class="product-info">
                 <nav aria-label="breadcrumb" class="mb-3">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Trang chủ</a></li>
-                        <li class="breadcrumb-item"><a href="{{ url_for('products') }}">Sản phẩm</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url_for('products.index') }}">Sản phẩm</a></li>
                         <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
                     </ol>
                 </nav>
@@ -102,7 +102,7 @@
                 {% elif not current_user.is_authenticated %}
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
-                    <a href="{{ url_for('login') }}">Đăng nhập</a> để thêm sản phẩm vào giỏ hàng.
+                    <a href="{{ url_for('auth.login') }}">Đăng nhập</a> để thêm sản phẩm vào giỏ hàng.
                 </div>
                 {% endif %}
                 

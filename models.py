@@ -1,17 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
-
-class Base(DeclarativeBase):
-    pass
-
-# Create a separate db instance to avoid circular imports
-from flask import current_app
-from werkzeug.local import LocalProxy
-
-def get_db():
-    return current_app.extensions['sqlalchemy']
-
-db = LocalProxy(get_db)
+from app import db
 from flask_login import UserMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
