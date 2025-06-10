@@ -12,46 +12,72 @@ load_dotenv()
 def test_supabase_connection():
     """Test connection to Supabase database"""
     try:
-        from app import app, db
+        import psycopg2
+        from urllib.parse import urlparse
         
-        with app.app_context():
-            # Test basic connection
-            result = db.engine.execute("SELECT 1 as test")
-            print("✅ Supabase connection successful!")
+        # Parse DATABASE_URL
+        db_url = os.environ.get('DATABASE_URL')
+        if not db_url:
+            print("❌ DATABASE_URL not found in environment")
+            return False
             
-            # List all tables
-            tables = db.engine.execute("""
-                SELECT table_name 
-                FROM information_schema.tables 
-                WHERE table_schema = 'public'
-                ORDER BY table_name
-            """)
-            
-            print("\n📋 Tables in database:")
-            table_list = [table[0] for table in tables]
-            if table_list:
-                for table in table_list:
-                    print(f"  - {table}")
-            else:
-                print("  No tables found. Run 'python -c \"from app import app, db; app.app_context().push(); db.create_all()\"' first")
-            
-            # Test sample data
-            if 'user' in table_list:
-                user_count = db.engine.execute("SELECT COUNT(*) FROM \"user\"").scalar()
-                print(f"\n👥 Users in database: {user_count}")
-            
-            if 'product' in table_list:
-                product_count = db.engine.execute("SELECT COUNT(*) FROM product").scalar()
-                print(f"🛍️ Products in database: {product_count}")
-                
-            return True
-            
+        parsed = urlparse(db_url)
+        
+        # Direct connection test
+        conn = psycopg2.connect(
+            host=parsed.hostname,
+            port=parsed.port,
+            database=parsed.path[1:],  # Remove leading /
+            user=parsed.username,
+            password=parsed.password
+        )
+        
+        cursor = conn.cursor()
+        
+        # Test basic connection
+        cursor.execute("SELECT 1 as test")
+        print("✅ Supabase connection successful!")
+        
+        # List all tables
+        cursor.execute("""
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public'
+            ORDER BY table_name
+        """)
+        
+        tables = cursor.fetchall()
+        print("\n📋 Tables in database:")
+        table_list = [table[0] for table in tables]
+        
+        if table_list:
+            for table in table_list:
+                print(f"  - {table}")
+        else:
+            print("  No tables found. Run database initialization first.")
+        
+        # Test sample data
+        if 'user' in table_list:
+            cursor.execute('SELECT COUNT(*) FROM "user"')
+            user_count = cursor.fetchone()[0]
+            print(f"\n👥 Users in database: {user_count}")
+        
+        if 'product' in table_list:
+            cursor.execute("SELECT COUNT(*) FROM product")
+            product_count = cursor.fetchone()[0]
+            print(f"🛍️ Products in database: {product_count}")
+        
+        cursor.close()
+        conn.close()
+        return True
+        
     except Exception as e:
         print(f"❌ Connection failed: {e}")
         print("\n🔧 Troubleshooting:")
         print("1. Check your DATABASE_URL in .env file")
         print("2. Verify Supabase project is running")
         print("3. Check password and project reference")
+        print("4. Make sure special characters in password are URL-encoded")
         return False
 
 def check_environment():
