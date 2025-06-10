@@ -152,7 +152,13 @@ class FaceAnalyzer:
             'normal': neutral_score
         }
         
-        skin_type = max(scores.keys(), key=lambda k: scores[k])
+        # Find skin type with highest score
+        max_score = 0
+        skin_type = 'normal'
+        for stype, score in scores.items():
+            if score > max_score:
+                max_score = score
+                skin_type = stype
         
         # If scores are close, classify as combination
         if abs(oily_score - dry_score) < 20 and max(oily_score, dry_score) > neutral_score:
