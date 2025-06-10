@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Thanh toán - Beauty App{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="checkout-header mb-4">
+                <h1 class="h2 mb-3">
+                    <i class="fas fa-credit-card me-2 text-primary"></i>Thanh toán
+                </h1>
+                
+                <!-- Checkout Steps -->
+                <div class="checkout-steps mb-4">
+                    <div class="d-flex justify-content-between">
+                        <div class="step completed">
+                            <div class="step-circle">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span>Giỏ hàng</span>
+                        </div>
+                        <div class="step active">
+                            <div class="step-circle">2</div>
+                            <span>Thông tin</span>
+                        </div>
+                        <div class="step">
+                            <div class="step-circle">3</div>
+                            <span>Hoàn tất</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <form method="POST" class="needs-validation" novalidate>
+                {{ form.hidden_tag() }}
+                
+                <div class="row">
+                    <!-- Shipping Information -->
+                    <div class="col-lg-7">
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-shipping-fast me-2"></i>Thông tin giao hàng
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        {{ form.full_name.label(class="form-label") }}
+                                        {{ form.full_name(class="form-control form-control-lg", required=True) }}
+                                        {% if form.full_name.errors %}
+                                            <div class="text-danger mt-1">
+                                                {% for error in form.full_name.errors %}
+                                                    <small>{{ error }}</small><br>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        {{ form.phone.label(class="form-label") }}
+                                        {{ form.phone(class="form-control form-control-lg", required=True) }}
+                                        {% if form.phone.errors %}
+                                            <div class="text-danger mt-1">
+                                                {% for error in form.phone.errors %}
+                                                    <small>{{ error }}</small><br>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        {{ form.address.label(class="form-label") }}
+                                        {{ form.address(class="form-control", rows="3", required=True) }}
+                                        {% if form.address.errors %}
+                                            <div class="text-danger mt-1">
+                                                {% for error in form.address.errors %}
+                                                    <small>{{ error }}</small><br>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        {{ form.notes.label(class="form-label") }}
+                                        {{ form.notes(class="form-control", rows="2") }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Method -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-credit-card me-2"></i>Phương thức thanh toán
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                {% for choice in form.payment_method.choices %}
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_{{ choice[0] }}" value="{{ choice[0] }}" {% if loop.first %}checked{% endif %}>
+                                    <label class="form-check-label d-flex align-items-center" for="payment_{{ choice[0] }}">
+                                        {% if choice[0] == 'cod' %}
+                                        <i class="fas fa-money-bill-wave me-2 text-success"></i>
+                                        {% elif choice[0] == 'bank_transfer' %}
+                                        <i class="fas fa-university me-2 text-primary"></i>
+                                        {% elif choice[0] == 'momo' %}
+                                        <i class="fas fa-mobile-alt me-2 text-danger"></i>
+                                        {% elif choice[0] == 'zalopay' %}
+                                        <i class="fas fa-wallet me-2 text-info"></i>
+                                        {% endif %}
+                                        {{ choice[1] }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Summary -->
+                    <div class="col-lg-5">
+                        <div class="card border-0 shadow-sm sticky-top">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Đơn hàng của bạn</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="order-summary">
+                                    <div class="summary-item d-flex justify-content-between mb-2">
+                                        <span>Tạm tính:</span>
+                                        <span>{{ "{:,.0f}".format(total) }}đ</span>
+                                    </div>
+                                    <div class="summary-item d-flex justify-content-between mb-2">
+                                        <span>Phí vận chuyển:</span>
+                                        <span class="text-success">Miễn phí</span>
+                                    </div>
+                                    <div class="summary-item d-flex justify-content-between mb-2">
+                                        <span>Thuế VAT:</span>
+                                        <span>Đã bao gồm</span>
+                                    </div>
+                                    <hr>
+                                    <div class="summary-total d-flex justify-content-between mb-3">
+                                        <strong>Tổng cộng:</strong>
+                                        <strong class="text-primary h5">{{ "{:,.0f}".format(total) }}đ</strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid mb-3">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-check me-2"></i>Đặt hàng
+                                    </button>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <a href="{{ url_for('main.cart') }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Quay lại giỏ hàng
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Security Notice -->
+                        <div class="security-notice mt-3 p-3 bg-light rounded">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-shield-alt text-success me-2"></i>
+                                <small>Thông tin của bạn được bảo mật hoàn toàn</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        });
+    });
+    
+    // Phone number formatting
+    const phoneInput = document.querySelector('input[name="phone"]');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+            // Simple phone number formatting for Vietnamese numbers
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.startsWith('84')) {
+                    value = '+84 ' + value.substring(2);
+                } else if (value.startsWith('0')) {
+                    value = value.substring(1);
+                    value = '+84 ' + value;
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

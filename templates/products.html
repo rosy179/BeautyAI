@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Sản phẩm mỹ phẩm - Beauty App{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-6 mb-3">
+                <i class="fas fa-shopping-bag me-2 text-primary"></i>Sản phẩm mỹ phẩm
+            </h1>
+            <p class="lead text-muted">Khám phá bộ sưu tập mỹ phẩm chính hãng từ các thương hiệu uy tín</p>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Tìm kiếm</label>
+                    <input type="text" name="search" class="form-control" placeholder="Tên sản phẩm..." value="{{ search_query or '' }}">
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Danh mục</label>
+                    <select name="category" class="form-select">
+                        <option value="">Tất cả danh mục</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if current_category == category.id|string %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label class="form-label">Loại da</label>
+                    <select name="skin_type" class="form-select">
+                        <option value="">Tất cả loại da</option>
+                        <option value="oily" {% if current_skin_type == 'oily' %}selected{% endif %}>Da dầu</option>
+                        <option value="dry" {% if current_skin_type == 'dry' %}selected{% endif %}>Da khô</option>
+                        <option value="combination" {% if current_skin_type == 'combination' %}selected{% endif %}>Da hỗn hợp</option>
+                        <option value="sensitive" {% if current_skin_type == 'sensitive' %}selected{% endif %}>Da nhạy cảm</option>
+                        <option value="normal" {% if current_skin_type == 'normal' %}selected{% endif %}>Da thường</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search me-1"></i>Lọc
+                    </button>
+                    <a href="{{ url_for('products.index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i>Xóa
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Products Grid -->
+    {% if products.items %}
+    <div class="row g-4 mb-4">
+        {% for product in products.items %}
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+            <div class="card product-card h-100 border-0 shadow-sm">
+                <div class="product-image position-relative">
+                    {% if product.image_url %}
+                    <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
+                    {% else %}
+                    <div class="placeholder-image d-flex align-items-center justify-content-center" style="height: 250px;">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Skin Type Badge -->
+                    {% if product.skin_type != 'all' %}
+                    <span class="position-absolute top-0 end-0 badge bg-info m-2">
+                        {% if product.skin_type == 'oily' %}Da dầu
+                        {% elif product.skin_type == 'dry' %}Da khô
+                        {% elif product.skin_type == 'combination' %}Da hỗn hợp
+                        {% elif product.skin_type == 'sensitive' %}Da nhạy cảm
+                        {% else %}Da thường{% endif %}
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <div class="card-body d-flex flex-column">
+                    <h6 class="card-title">{{ product.name }}</h6>
+                    {% if product.brand %}
+                    <p class="text-muted small mb-1">{{ product.brand }}</p>
+                    {% endif %}
+                    <p class="card-text text-muted small flex-grow-1">{{ product.description[:100] }}{% if product.description|length > 100 %}...{% endif %}</p>
+                    
+                    <!-- Rating -->
+                    <div class="product-rating mb-2">
+                        {% for i in range(5) %}
+                            {% if i < product.average_rating %}
+                            <i class="fas fa-star text-warning"></i>
+                            {% else %}
+                            <i class="far fa-star text-muted"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <small class="text-muted ms-1">({{ product.reviews|length }})</small>
+                    </div>
+                    
+                    <!-- Price and Actions -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="h6 text-primary mb-0">{{ "{:,.0f}".format(product.price) }}đ</span>
+                        <div class="btn-group">
+                            <a href="{{ url_for('products.detail', product_id=product.id) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>Xem
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if products.pages > 1 %}
+    <nav aria-label="Product pagination">
+        <ul class="pagination justify-content-center">
+            {% if products.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('products.index', page=products.prev_num, category=current_category, skin_type=current_skin_type, search=search_query) }}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for page_num in products.iter_pages() %}
+            {% if page_num %}
+                {% if page_num != products.page %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('products.index', page=page_num, category=current_category, skin_type=current_skin_type, search=search_query) }}">{{ page_num }}</a>
+                </li>
+                {% else %}
+                <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                </li>
+                {% endif %}
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">...</span>
+            </li>
+            {% endif %}
+            {% endfor %}
+            
+            {% if products.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('products.index', page=products.next_num, category=current_category, skin_type=current_skin_type, search=search_query) }}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <!-- No Products Found -->
+    <div class="text-center py-5">
+        <i class="fas fa-search fa-4x text-muted mb-3"></i>
+        <h4>Không tìm thấy sản phẩm</h4>
+        <p class="text-muted">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
+        <a href="{{ url_for('products.index') }}" class="btn btn-primary">
+            <i class="fas fa-refresh me-1"></i>Xem tất cả sản phẩm
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to product cards
+    const productCards = document.querySelectorAll('.product-card');
+    productCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

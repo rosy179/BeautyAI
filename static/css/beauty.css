@@ -1,0 +1,446 @@
+/* Beauty App Custom Styles */
+
+/* Color Variables */
+:root {
+    --beauty-primary: #e91e63;
+    --beauty-secondary: #f8bbd9;
+    --beauty-accent: #ff6b9d;
+    --beauty-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --beauty-gold: #ffd700;
+    --beauty-rose: #ff69b4;
+}
+
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+.main-content {
+    padding-top: 80px;
+    min-height: calc(100vh - 200px);
+}
+
+/* Hero Section */
+.hero-section {
+    background: var(--beauty-gradient);
+    min-height: 80vh;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="25" cy="25" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>');
+    animation: sparkle 20s linear infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(180deg); }
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+.hero-image-container {
+    position: relative;
+}
+
+.floating-icons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.floating-icons i {
+    position: absolute;
+    font-size: 2rem;
+    animation: float 3s ease-in-out infinite;
+}
+
+.floating-icons i:nth-child(1) {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.floating-icons i:nth-child(2) {
+    top: 60%;
+    right: 15%;
+    animation-delay: 1s;
+}
+
+.floating-icons i:nth-child(3) {
+    bottom: 30%;
+    left: 20%;
+    animation-delay: 2s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Product Cards */
+.product-card {
+    transition: all 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.product-image {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-image img {
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.1);
+}
+
+.placeholder-image {
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    border-radius: 10px;
+}
+
+.product-rating .fa-star {
+    font-size: 0.9rem;
+}
+
+/* Beauty-specific animations */
+.feature-icon i {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Step Cards */
+.step-card {
+    padding: 2rem;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.step-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-5px);
+}
+
+.step-number {
+    margin-bottom: 1rem;
+}
+
+/* Skin Analysis Styles */
+.analysis-tips {
+    border-left: 4px solid var(--beauty-primary);
+}
+
+.result-card {
+    border-radius: 10px;
+    border-left: 4px solid var(--bs-primary);
+}
+
+.routine-card {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    transition: all 0.3s ease;
+}
+
+.routine-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Chat Styles */
+.chat-messages {
+    background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+}
+
+.message-bubble {
+    max-width: 80%;
+    word-wrap: break-word;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.chat-input {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+.avatar i {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Blog Styles */
+.blog-post-card {
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.blog-image-container {
+    overflow: hidden;
+}
+
+.image-overlay {
+    background: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.blog-post-card:hover .image-overlay {
+    opacity: 1;
+}
+
+.post-tags .badge {
+    font-size: 0.75rem;
+    padding: 0.35em 0.5em;
+}
+
+/* Profile Styles */
+.profile-avatar {
+    position: relative;
+}
+
+.profile-avatar::after {
+    content: '';
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    background: #28a745;
+    border: 3px solid white;
+    border-radius: 50%;
+}
+
+.stat-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+/* Checkout Styles */
+.checkout-steps {
+    margin: 2rem 0;
+}
+
+.checkout-steps .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e9ecef;
+    color: #6c757d;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.step.completed .step-circle {
+    background: #28a745;
+    color: white;
+}
+
+.step.active .step-circle {
+    background: var(--bs-primary);
+    color: white;
+}
+
+.checkout-steps .d-flex::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+/* Authentication Styles */
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.benefit-item {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.benefit-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        text-align: center;
+        padding: 2rem 0;
+    }
+    
+    .floating-icons {
+        display: none;
+    }
+    
+    .product-card {
+        margin-bottom: 1rem;
+    }
+    
+    .chat-messages {
+        height: 400px !important;
+    }
+    
+    .message-bubble {
+        font-size: 0.9rem;
+    }
+    
+    .checkout-steps .d-flex {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .checkout-steps .d-flex::before {
+        display: none;
+    }
+}
+
+/* Custom Scrollbar */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Loading Animations */
+.loading-spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 0.25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Beauty-themed Gradients */
+.bg-gradient-beauty {
+    background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+}
+
+.bg-gradient-soft {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.bg-gradient-gold {
+    background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+}
+
+/* Utility Classes */
+.text-beauty-primary {
+    color: var(--beauty-primary) !important;
+}
+
+.bg-beauty-primary {
+    background-color: var(--beauty-primary) !important;
+}
+
+.border-beauty-primary {
+    border-color: var(--beauty-primary) !important;
+}
+
+.shadow-beauty {
+    box-shadow: 0 0.5rem 1rem rgba(233, 30, 99, 0.15) !important;
+}
+
+/* Form Enhancements */
+.form-control:focus {
+    border-color: var(--beauty-primary);
+    box-shadow: 0 0 0 0.2rem rgba(233, 30, 99, 0.25);
+}
+
+.btn-primary {
+    background: var(--beauty-gradient);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Social Media Icons */
+.social-links a {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: var(--beauty-primary);
+    transform: translateY(-2px);
+}

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Blog làm đẹp - Beauty App{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <!-- Blog Header -->
+    <div class="row mb-5">
+        <div class="col text-center">
+            <h1 class="display-5 mb-3">
+                <i class="fas fa-blog me-2 text-primary"></i>Blog làm đẹp
+            </h1>
+            <p class="lead text-muted">Cập nhật kiến thức và xu hướng làm đẹp mới nhất từ các chuyên gia</p>
+        </div>
+    </div>
+    
+    <!-- Blog Actions -->
+    {% if current_user.is_authenticated %}
+    <div class="row mb-4">
+        <div class="col text-end">
+            <a href="{{ url_for('blog.create_post') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Viết bài mới
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Blog Posts -->
+    {% if posts.items %}
+    <div class="row g-4">
+        {% for post in posts.items %}
+        <div class="col-lg-4 col-md-6">
+            <div class="card blog-post-card h-100 border-0 shadow-sm">
+                <!-- Featured Image -->
+                {% if post.featured_image %}
+                <div class="blog-image-container position-relative">
+                    <img src="{{ post.featured_image }}" class="card-img-top" alt="{{ post.title }}" style="height: 250px; object-fit: cover;">
+                    <div class="image-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                        <a href="{{ url_for('blog.post_detail', post_id=post.id) }}" class="btn btn-light btn-lg rounded-circle">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="placeholder-image d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
+                    <i class="fas fa-image fa-4x text-muted"></i>
+                </div>
+                {% endif %}
+                
+                <div class="card-body d-flex flex-column">
+                    <!-- Post Meta -->
+                    <div class="post-meta mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-user me-1"></i>{{ post.author.full_name or post.author.username }}
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-calendar me-1"></i>{{ post.date_created.strftime('%d/%m/%Y') }}
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-eye me-1"></i>{{ post.views }} lượt xem
+                        </small>
+                    </div>
+                    
+                    <!-- Post Title -->
+                    <h5 class="card-title">
+                        <a href="{{ url_for('blog.post_detail', post_id=post.id) }}" class="text-decoration-none">
+                            {{ post.title }}
+                        </a>
+                    </h5>
+                    
+                    <!-- Post Excerpt -->
+                    <p class="card-text flex-grow-1">
+                        {{ post.excerpt or (post.content[:150] + '...') }}
+                    </p>
+                    
+                    <!-- Tags -->
+                    {% if post.tags %}
+                    <div class="post-tags mb-3">
+                        {% for tag in post.tags.split(',') %}
+                        <span class="badge bg-secondary me-1">{{ tag.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Post Actions -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('blog.post_detail', post_id=post.id) }}" class="btn btn-outline-primary">
+                            Đọc thêm <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                        <div class="post-stats">
+                            <small class="text-muted">
+                                <i class="fas fa-comments me-1"></i>{{ post.comments|length }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if posts.pages > 1 %}
+    <nav aria-label="Blog pagination" class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if posts.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('blog.index', page=posts.prev_num) }}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+            
+            {% for page_num in posts.iter_pages() %}
+            {% if page_num %}
+                {% if page_num != posts.page %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('blog.index', page=page_num) }}">{{ page_num }}</a>
+                </li>
+                {% else %}
+                <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                </li>
+                {% endif %}
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">...</span>
+            </li>
+            {% endif %}
+            {% endfor %}
+            
+            {% if posts.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('blog.index', page=posts.next_num) }}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <!-- No Posts -->
+    <div class="text-center py-5">
+        <i class="fas fa-blog fa-5x text-muted mb-4"></i>
+        <h3>Chưa có bài viết nào</h3>
+        <p class="text-muted mb-4">Hãy là người đầu tiên chia sẻ kiến thức làm đẹp!</p>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('blog.create_post') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus me-2"></i>Viết bài đầu tiên
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to blog cards
+    const blogCards = document.querySelectorAll('.blog-post-card');
+    blogCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.transition = 'transform 0.3s ease';
+            
+            const overlay = this.querySelector('.image-overlay');
+            if (overlay) {
+                overlay.style.opacity = '1';
+            }
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            
+            const overlay = this.querySelector('.image-overlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

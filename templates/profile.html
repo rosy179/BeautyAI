@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}Hồ sơ cá nhân - Beauty App{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row">
+        <!-- Profile Sidebar -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <div class="profile-avatar mb-3">
+                        <i class="fas fa-user-circle fa-5x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">{{ current_user.full_name or current_user.username }}</h5>
+                    <p class="text-muted mb-2">{{ current_user.email }}</p>
+                    {% if current_user.phone %}
+                    <p class="text-muted mb-2">
+                        <i class="fas fa-phone me-2"></i>{{ current_user.phone }}
+                    </p>
+                    {% endif %}
+                    <small class="text-muted">
+                        Thành viên từ {{ current_user.date_joined.strftime('%m/%Y') }}
+                    </small>
+                </div>
+            </div>
+            
+            <!-- Profile Stats -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">Thống kê</h6>
+                </div>
+                <div class="card-body">
+                    <div class="stat-item d-flex justify-content-between mb-2">
+                        <span>Đơn hàng:</span>
+                        <span class="badge bg-primary">{{ orders|length }}</span>
+                    </div>
+                    <div class="stat-item d-flex justify-content-between mb-2">
+                        <span>Đánh giá:</span>
+                        <span class="badge bg-success">{{ reviews|length }}</span>
+                    </div>
+                    <div class="stat-item d-flex justify-content-between">
+                        <span>Phân tích da:</span>
+                        <span class="badge bg-info">{{ analyses|length }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Content -->
+        <div class="col-lg-9">
+            <!-- Profile Tabs -->
+            <ul class="nav nav-tabs nav-fill mb-4" id="profileTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button">
+                        <i class="fas fa-shopping-bag me-2"></i>Đơn hàng
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="analyses-tab" data-bs-toggle="tab" data-bs-target="#analyses" type="button">
+                        <i class="fas fa-chart-line me-2"></i>Phân tích da
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button">
+                        <i class="fas fa-star me-2"></i>Đánh giá
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button">
+                        <i class="fas fa-cog me-2"></i>Cài đặt
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="profileTabsContent">
+                <!-- Orders Tab -->
+                <div class="tab-pane fade show active" id="orders" role="tabpanel">
+                    {% if orders %}
+                    <div class="row g-4">
+                        {% for order in orders %}
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-0">Đơn hàng #{{ order.id }}</h6>
+                                        <small class="text-muted">{{ order.date_created.strftime('%d/%m/%Y %H:%M') }}</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge 
+                                            {% if order.status == 'pending' %}bg-warning
+                                            {% elif order.status == 'confirmed' %}bg-info
+                                            {% elif order.status == 'shipped' %}bg-primary
+                                            {% elif order.status == 'delivered' %}bg-success
+                                            {% else %}bg-danger{% endif %}">
+                                            {% if order.status == 'pending' %}Chờ xử lý
+                                            {% elif order.status == 'confirmed' %}Đã xác nhận
+                                            {% elif order.status == 'shipped' %}Đang giao
+                                            {% elif order.status == 'delivered' %}Đã giao
+                                            {% else %}Đã hủy{% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <h6>Sản phẩm:</h6>
+                                            {% for item in order.order_items %}
+                                            <div class="order-item d-flex align-items-center mb-2">
+                                                <div class="item-info flex-grow-1">
+                                                    <span class="fw-medium">{{ item.product.name }}</span>
+                                                    <small class="text-muted d-block">Số lượng: {{ item.quantity }} x {{ "{:,.0f}".format(item.price) }}đ</small>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="col-md-4 text-md-end">
+                                            <div class="order-total">
+                                                <h6 class="text-primary">Tổng: {{ "{:,.0f}".format(order.total_amount) }}đ</h6>
+                                                <p class="text-muted small mb-0">{{ order.payment_method }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-shopping-bag fa-4x text-muted mb-3"></i>
+                        <h5>Bạn chưa có đơn hàng nào</h5>
+                        <p class="text-muted">Hãy khám phá các sản phẩm tuyệt vời của chúng tôi!</p>
+                        <a href="{{ url_for('products.index') }}" class="btn btn-primary">
+                            <i class="fas fa-shopping-bag me-2"></i>Mua sắm ngay
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Skin Analyses Tab -->
+                <div class="tab-pane fade" id="analyses" role="tabpanel">
+                    {% if analyses %}
+                    <div class="row g-4">
+                        {% for analysis in analyses %}
+                        <div class="col-md-6">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header">
+                                    <h6 class="mb-0">
+                                        <i class="fas fa-chart-line me-2 text-info"></i>
+                                        Phân tích {{ analysis.date_analyzed.strftime('%d/%m/%Y') }}
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="analysis-result">
+                                        <p><strong>Loại da:</strong> 
+                                            <span class="badge bg-primary">
+                                                {% if analysis.skin_type == 'oily' %}Da dầu
+                                                {% elif analysis.skin_type == 'dry' %}Da khô
+                                                {% elif analysis.skin_type == 'combination' %}Da hỗn hợp
+                                                {% elif analysis.skin_type == 'sensitive' %}Da nhạy cảm
+                                                {% else %}Da thường{% endif %}
+                                            </span>
+                                        </p>
+                                        
+                                        {% if analysis.skin_concerns %}
+                                        <p><strong>Vấn đề da:</strong></p>
+                                        <div class="mb-2">
+                                            {% for concern in analysis.skin_concerns %}
+                                            <span class="badge bg-warning text-dark me-1">
+                                                {% if concern == 'acne' %}Mụn
+                                                {% elif concern == 'dark_spots' %}Đốm đen
+                                                {% elif concern == 'dryness' %}Da khô
+                                                {% else %}{{ concern }}{% endif %}
+                                            </span>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <a href="{{ url_for('main.analysis_results', analysis_id=analysis.id) }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>Xem chi tiết
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-chart-line fa-4x text-muted mb-3"></i>
+                        <h5>Bạn chưa thực hiện phân tích da</h5>
+                        <p class="text-muted">Hãy phân tích da để nhận được lời khuyên cá nhân hóa!</p>
+                        <a href="{{ url_for('main.skin_analysis') }}" class="btn btn-primary">
+                            <i class="fas fa-camera me-2"></i>Phân tích da ngay
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Reviews Tab -->
+                <div class="tab-pane fade" id="reviews" role="tabpanel">
+                    {% if reviews %}
+                    <div class="row g-4">
+                        {% for review in reviews %}
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h6 class="mb-1">
+                                                <a href="{{ url_for('products.detail', product_id=review.product.id) }}" 
+                                                   class="text-decoration-none">{{ review.product.name }}</a>
+                                            </h6>
+                                            <div class="rating mb-2">
+                                                {% for i in range(5) %}
+                                                    {% if i < review.rating %}
+                                                    <i class="fas fa-star text-warning"></i>
+                                                    {% else %}
+                                                    <i class="far fa-star text-muted"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">{{ review.date_created.strftime('%d/%m/%Y') }}</small>
+                                    </div>
+                                    
+                                    {% if review.title %}
+                                    <h6>{{ review.title }}</h6>
+                                    {% endif %}
+                                    
+                                    <p class="mb-0">{{ review.content }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-star fa-4x text-muted mb-3"></i>
+                        <h5>Bạn chưa có đánh giá nào</h5>
+                        <p class="text-muted">Hãy mua sắm và đánh giá sản phẩm để chia sẻ trải nghiệm!</p>
+                        <a href="{{ url_for('products.index') }}" class="btn btn-primary">
+                            <i class="fas fa-shopping-bag me-2"></i>Khám phá sản phẩm
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Settings Tab -->
+                <div class="tab-pane fade" id="settings" role="tabpanel">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-edit me-2"></i>Thông tin cá nhân
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Họ và tên</label>
+                                        <input type="text" class="form-control" value="{{ current_user.full_name or '' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" value="{{ current_user.email }}" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Số điện thoại</label>
+                                        <input type="text" class="form-control" value="{{ current_user.phone or '' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Tên đăng nhập</label>
+                                        <input type="text" class="form-control" value="{{ current_user.username }}" readonly>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Địa chỉ</label>
+                                        <textarea class="form-control" rows="3">{{ current_user.address or '' }}</textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Cập nhật thông tin
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Change Password -->
+                    <div class="card border-0 shadow-sm mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-lock me-2"></i>Đổi mật khẩu
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Mật khẩu hiện tại</label>
+                                    <input type="password" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mật khẩu mới</label>
+                                    <input type="password" class="form-control">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Xác nhận mật khẩu mới</label>
+                                    <input type="password" class="form-control">
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Profile settings form submission (placeholder)
+    const settingsForms = document.querySelectorAll('#settings form');
+    settingsForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Tính năng cập nhật thông tin sẽ được triển khai trong phiên bản tiếp theo.');
+        });
+    });
+});
+</script>
+{% endblock %}

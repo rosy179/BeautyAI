@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Phân tích da AI - Beauty App{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {% if not show_results %}
+            <!-- Analysis Form -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h2 class="mb-0">
+                        <i class="fas fa-camera me-2"></i>Phân tích da với AI
+                    </h2>
+                    <p class="mb-0 mt-2">Sử dụng công nghệ Face++ để phân tích chính xác tình trạng làn da</p>
+                </div>
+                
+                <div class="card-body p-5">
+                    <form method="POST" enctype="multipart/form-data" id="skinAnalysisForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.skin_image.id }}" class="form-label">
+                                <i class="fas fa-image me-2"></i>Ảnh khuôn mặt *
+                            </label>
+                            {{ form.skin_image(class="form-control form-control-lg", accept="image/*") }}
+                            {% if form.skin_image.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.skin_image.errors %}
+                                        <small>{{ error }}</small><br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                Tải lên ảnh khuôn mặt rõ nét, không trang điểm để có kết quả chính xác nhất.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.age.id }}" class="form-label">
+                                <i class="fas fa-birthday-cake me-2"></i>Tuổi (tùy chọn)
+                            </label>
+                            {{ form.age(class="form-control") }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.skin_concerns.id }}" class="form-label">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Mối quan tâm về da
+                            </label>
+                            {{ form.skin_concerns(class="form-select") }}
+                        </div>
+                        
+                        <div class="analysis-tips mb-4 p-3 bg-light rounded">
+                            <h6><i class="fas fa-lightbulb me-2 text-warning"></i>Để có kết quả tốt nhất:</h6>
+                            <ul class="mb-0">
+                                <li>Chụp ảnh trong ánh sáng tự nhiên</li>
+                                <li>Khuôn mặt không trang điểm</li>
+                                <li>Nhìn thẳng vào camera</li>
+                                <li>Tránh bóng tối che khuất khuôn mặt</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="analyzeBtn">
+                                <i class="fas fa-search me-2"></i>Bắt đầu phân tích
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            {% else %}
+            <!-- Analysis Results -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white text-center py-4">
+                    <h2 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>Kết quả phân tích da
+                    </h2>
+                </div>
+                
+                <div class="card-body p-5">
+                    {% if analysis.analysis_result.success %}
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="result-card p-3 bg-light rounded">
+                                <h5><i class="fas fa-user me-2 text-primary"></i>Thông tin cơ bản</h5>
+                                <p><strong>Loại da:</strong> 
+                                    <span class="badge bg-primary">
+                                        {% if analysis.skin_type == 'oily' %}Da dầu
+                                        {% elif analysis.skin_type == 'dry' %}Da khô
+                                        {% elif analysis.skin_type == 'combination' %}Da hỗn hợp
+                                        {% elif analysis.skin_type == 'sensitive' %}Da nhạy cảm
+                                        {% else %}Da thường{% endif %}
+                                    </span>
+                                </p>
+                                {% if analysis.analysis_result.age %}
+                                <p><strong>Độ tuổi ước tính:</strong> {{ analysis.analysis_result.age }} tuổi</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {% if analysis.skin_concerns %}
+                            <div class="result-card p-3 bg-light rounded">
+                                <h5><i class="fas fa-exclamation-triangle me-2 text-warning"></i>Vấn đề da</h5>
+                                {% for concern in analysis.skin_concerns %}
+                                <span class="badge bg-warning text-dark me-1 mb-1">
+                                    {% if concern == 'acne' %}Mụn trứng cá
+                                    {% elif concern == 'dark_spots' %}Đốm đen
+                                    {% elif concern == 'dryness' %}Da khô
+                                    {% else %}{{ concern }}{% endif %}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Skincare Routine -->
+                    <div class="skincare-routine mb-4">
+                        <h4><i class="fas fa-spa me-2 text-success"></i>Lộ trình chăm sóc da được đề xuất</h4>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="routine-card p-3 border rounded">
+                                    <h6><i class="fas fa-sun me-2 text-warning"></i>Buổi sáng</h6>
+                                    <ol class="mb-0">
+                                        {% for step in analysis.recommended_routine.morning %}
+                                        <li>{{ step }}</li>
+                                        {% endfor %}
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <div class="routine-card p-3 border rounded">
+                                    <h6><i class="fas fa-moon me-2 text-info"></i>Buổi tối</h6>
+                                    <ol class="mb-0">
+                                        {% for step in analysis.recommended_routine.evening %}
+                                        <li>{{ step }}</li>
+                                        {% endfor %}
+                                    </ol>
+                                </div>
+                            </div>
+                            
+                            {% if analysis.recommended_routine.weekly %}
+                            <div class="col-md-4 mb-3">
+                                <div class="routine-card p-3 border rounded">
+                                    <h6><i class="fas fa-calendar-week me-2 text-primary"></i>Hàng tuần</h6>
+                                    <ul class="mb-0">
+                                        {% for step in analysis.recommended_routine.weekly %}
+                                        <li>{{ step }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ analysis.analysis_result.error }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="text-center">
+                        <a href="{{ url_for('main.skin_analysis') }}" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-redo me-2"></i>Phân tích lại
+                        </a>
+                        <a href="{{ url_for('chat.index') }}" class="btn btn-info">
+                            <i class="fas fa-comments me-2"></i>Tư vấn thêm
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recommended Products -->
+            {% if recommended_products %}
+            <div class="card shadow-lg border-0 mt-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-shopping-bag me-2"></i>Sản phẩm được gợi ý
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for product in recommended_products %}
+                        <div class="col-md-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                {% if product.image_url %}
+                                <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
+                                {% else %}
+                                <div class="placeholder-image d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                                {% endif %}
+                                <div class="card-body d-flex flex-column">
+                                    <h6 class="card-title">{{ product.name }}</h6>
+                                    <p class="card-text text-muted small flex-grow-1">{{ product.description[:80] }}...</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="h6 text-primary mb-0">{{ "{:,.0f}".format(product.price) }}đ</span>
+                                        <a href="{{ url_for('products.detail', product_id=product.id) }}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/skin-analysis.js') }}"></script>
+{% endblock %}

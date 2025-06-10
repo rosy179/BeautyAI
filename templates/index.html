@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}Beauty App - Làm Đẹp Chuyên Nghiệp{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-gradient py-5">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Khám phá vẻ đẹp tự nhiên của bạn
+                </h1>
+                <p class="lead mb-4">
+                    Sử dụng công nghệ AI tiên tiến để phân tích làn da và nhận được lộ trình skincare cá nhân hóa hoàn toàn miễn phí.
+                </p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{{ url_for('main.skin_analysis') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-camera me-2"></i>Phân tích da ngay
+                    </a>
+                    <a href="{{ url_for('products.index') }}" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-shopping-bag me-2"></i>Xem sản phẩm
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="hero-image-container">
+                    <i class="fas fa-user-circle display-1 text-warning opacity-75"></i>
+                    <div class="floating-icons">
+                        <i class="fas fa-sparkles text-warning"></i>
+                        <i class="fas fa-heart text-danger"></i>
+                        <i class="fas fa-star text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="h1 mb-3">Tại sao chọn Beauty App?</h2>
+                <p class="lead text-muted">Giải pháp làm đẹp toàn diện với công nghệ hiện đại</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-brain fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">Phân tích AI</h5>
+                        <p class="card-text">Công nghệ Face++ phân tích chính xác tình trạng da và đưa ra lời khuyên cá nhân hóa.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-shopping-bag fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title">Mỹ phẩm chính hãng</h5>
+                        <p class="card-text">Hàng nghìn sản phẩm làm đẹp chính hãng từ các thương hiệu uy tín trên thế giới.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-comments fa-3x text-info"></i>
+                        </div>
+                        <h5 class="card-title">Tư vấn 24/7</h5>
+                        <p class="card-text">Chuyên gia làm đẹp sẵn sàng tư vấn và giải đáp mọi thắc mắc của bạn mọi lúc.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-users fa-3x text-warning"></i>
+                        </div>
+                        <h5 class="card-title">Cộng đồng</h5>
+                        <p class="card-text">Kết nối với cộng đồng yêu thích làm đẹp, chia sẻ kinh nghiệm và học hỏi lẫn nhau.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+{% if featured_products %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col">
+                <h2 class="h1 text-center mb-3">Sản phẩm nổi bật</h2>
+                <p class="text-center text-muted">Những sản phẩm được yêu thích nhất</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            {% for product in featured_products %}
+            <div class="col-sm-6 col-lg-3">
+                <div class="card product-card h-100 border-0 shadow-sm">
+                    <div class="product-image">
+                        {% if product.image_url %}
+                        <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+                        {% else %}
+                        <div class="placeholder-image d-flex align-items-center justify-content-center">
+                            <i class="fas fa-image fa-3x text-muted"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title">{{ product.name }}</h6>
+                        <p class="card-text text-muted small flex-grow-1">{{ product.description[:80] }}...</p>
+                        <div class="product-rating mb-2">
+                            {% for i in range(5) %}
+                                {% if i < product.average_rating %}
+                                <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                <i class="far fa-star text-muted"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <small class="text-muted ms-1">({{ product.reviews|length }})</small>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h6 text-primary mb-0">{{ "{:,.0f}".format(product.price) }}đ</span>
+                            <a href="{{ url_for('products.detail', product_id=product.id) }}" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('products.index') }}" class="btn btn-primary">
+                Xem tất cả sản phẩm <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- How It Works -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="h1 mb-3">Cách thức hoạt động</h2>
+                <p class="lead text-muted">3 bước đơn giản để có làn da hoàn hảo</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="step-card">
+                    <div class="step-number mb-3">
+                        <span class="badge bg-primary rounded-circle p-3 fs-4">1</span>
+                    </div>
+                    <i class="fas fa-camera fa-3x text-primary mb-3"></i>
+                    <h5>Chụp ảnh khuôn mặt</h5>
+                    <p class="text-muted">Tải lên ảnh khuôn mặt của bạn để hệ thống AI phân tích tình trạng làn da.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 text-center">
+                <div class="step-card">
+                    <div class="step-number mb-3">
+                        <span class="badge bg-primary rounded-circle p-3 fs-4">2</span>
+                    </div>
+                    <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                    <h5>Nhận kết quả phân tích</h5>
+                    <p class="text-muted">Nhận báo cáo chi tiết về loại da, vấn đề da và lộ trình chăm sóc cá nhân.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 text-center">
+                <div class="step-card">
+                    <div class="step-number mb-3">
+                        <span class="badge bg-primary rounded-circle p-3 fs-4">3</span>
+                    </div>
+                    <i class="fas fa-shopping-cart fa-3x text-warning mb-3"></i>
+                    <h5>Mua sản phẩm phù hợp</h5>
+                    <p class="text-muted">Lựa chọn sản phẩm được gợi ý phù hợp với loại da và nhu cầu của bạn.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Blog Posts -->
+{% if recent_posts %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col">
+                <h2 class="h1 text-center mb-3">Blog làm đẹp</h2>
+                <p class="text-center text-muted">Cập nhật kiến thức và xu hướng làm đẹp mới nhất</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            {% for post in recent_posts %}
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    {% if post.featured_image %}
+                    <img src="{{ post.featured_image }}" class="card-img-top" alt="{{ post.title }}">
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title">{{ post.title }}</h6>
+                        <p class="card-text flex-grow-1">{{ post.excerpt or (post.content[:100] + '...') }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>{{ post.author.full_name or post.author.username }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="fas fa-eye me-1"></i>{{ post.views }}
+                            </small>
+                        </div>
+                        <a href="{{ url_for('blog.post_detail', post_id=post.id) }}" class="btn btn-outline-primary btn-sm mt-2">Đọc thêm</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('blog.index') }}" class="btn btn-primary">
+                Xem tất cả bài viết <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col">
+                <h2 class="mb-3">Sẵn sàng khám phá vẻ đẹp của bạn?</h2>
+                <p class="lead mb-4">Hãy bắt đầu hành trình làm đẹp cùng chúng tôi ngay hôm nay!</p>
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="{{ url_for('main.skin_analysis') }}" class="btn btn-light btn-lg">
+                        <i class="fas fa-camera me-2"></i>Phân tích da miễn phí
+                    </a>
+                    <a href="{{ url_for('chat.index') }}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-comments me-2"></i>Tư vấn ngay
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Add smooth scrolling and animations
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate floating icons
+    const floatingIcons = document.querySelectorAll('.floating-icons i');
+    floatingIcons.forEach((icon, index) => {
+        icon.style.animationDelay = (index * 0.5) + 's';
+    });
+    
+    // Add hover effects to product cards
+    const productCards = document.querySelectorAll('.product-card');
+    productCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.transition = 'transform 0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

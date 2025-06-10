@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Tư vấn làm đẹp - Beauty App{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="chat-container">
+                <div class="card border-0 shadow-lg">
+                    <div class="card-header bg-info text-white d-flex align-items-center">
+                        <div class="chat-avatar me-3">
+                            <i class="fas fa-robot fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Chuyên gia tư vấn làm đẹp</h5>
+                            <small>Luôn sẵn sàng hỗ trợ bạn 24/7</small>
+                        </div>
+                        <div class="ms-auto">
+                            <span class="badge bg-success">
+                                <i class="fas fa-circle me-1"></i>Online
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-0">
+                        <!-- Chat Messages -->
+                        <div class="chat-messages" id="chatMessages" style="height: 500px; overflow-y: auto;">
+                            {% if messages %}
+                                {% for message in messages %}
+                                <div class="message-wrapper p-3 {% if message.is_from_user %}border-bottom{% else %}bg-light border-bottom{% endif %}">
+                                    <div class="d-flex {% if message.is_from_user %}justify-content-end{% endif %}">
+                                        <div class="message-content" style="max-width: 80%;">
+                                            {% if not message.is_from_user %}
+                                            <div class="d-flex align-items-start">
+                                                <div class="avatar me-2">
+                                                    <i class="fas fa-robot text-info"></i>
+                                                </div>
+                                                <div class="message-bubble bg-light rounded p-3">
+                                                    <div class="message-text">{{ message.message|nl2br|safe }}</div>
+                                                    <small class="text-muted">{{ message.date_created.strftime('%H:%M - %d/%m/%Y') }}</small>
+                                                </div>
+                                            </div>
+                                            {% else %}
+                                            <div class="d-flex align-items-start justify-content-end">
+                                                <div class="message-bubble bg-primary text-white rounded p-3 me-2">
+                                                    <div class="message-text">{{ message.message|nl2br|safe }}</div>
+                                                    <small class="text-light opacity-75">{{ message.date_created.strftime('%H:%M - %d/%m/%Y') }}</small>
+                                                </div>
+                                                <div class="avatar">
+                                                    <i class="fas fa-user text-primary"></i>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                            <!-- Welcome Message -->
+                            <div class="welcome-message text-center p-5">
+                                <i class="fas fa-comments fa-4x text-info mb-4"></i>
+                                <h4>Chào mừng đến với tư vấn làm đẹp!</h4>
+                                <p class="text-muted mb-4">Tôi là chuyên gia AI sẵn sàng giúp bạn giải đáp mọi thắc mắc về skincare, makeup và làm đẹp.</p>
+                                <div class="quick-questions">
+                                    <p class="fw-bold mb-2">Câu hỏi thường gặp:</p>
+                                    <button class="btn btn-sm btn-outline-info me-2 mb-2" onclick="insertQuickQuestion('Loại da của tôi là gì?')">
+                                        Loại da của tôi là gì?
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info me-2 mb-2" onclick="insertQuickQuestion('Cách trị mụn hiệu quả?')">
+                                        Cách trị mụn hiệu quả?
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info me-2 mb-2" onclick="insertQuickQuestion('Skincare routine cho người mới bắt đầu?')">
+                                        Skincare routine cơ bản?
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info me-2 mb-2" onclick="insertQuickQuestion('Kem chống nắng nào tốt?')">
+                                        Kem chống nắng nào tốt?
+                                    </button>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Chat Input -->
+                        <div class="chat-input border-top p-3">
+                            <form method="POST" action="{{ url_for('chat.send_message') }}" id="chatForm">
+                                {{ form.hidden_tag() }}
+                                <div class="input-group">
+                                    {{ form.message(class="form-control form-control-lg", id="messageInput", style="border-right: none;") }}
+                                    <button type="submit" class="btn btn-primary" id="sendButton">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                                {% if form.message.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.message.errors %}
+                                            <small>{{ error }}</small><br>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chat Tips -->
+                <div class="card border-0 shadow-sm mt-4">
+                    <div class="card-body">
+                        <h6><i class="fas fa-lightbulb text-warning me-2"></i>Tips để nhận được lời khuyên tốt nhất:</h6>
+                        <ul class="mb-0">
+                            <li>Mô tả chi tiết loại da và vấn đề bạn đang gặp phải</li>
+                            <li>Cho biết các sản phẩm bạn đang sử dụng</li>
+                            <li>Đề cập đến ngân sách và thời gian mong muốn thấy kết quả</li>
+                            <li>Hỏi về cách sử dụng sản phẩm đúng cách</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+<script>
+function insertQuickQuestion(question) {
+    const messageInput = document.getElementById('messageInput');
+    messageInput.value = question;
+    messageInput.focus();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-scroll to bottom of chat
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Auto-focus message input
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        messageInput.focus();
+    }
+    
+    // Form submission handling
+    const chatForm = document.getElementById('chatForm');
+    const sendButton = document.getElementById('sendButton');
+    
+    chatForm.addEventListener('submit', function() {
+        sendButton.disabled = true;
+        sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    });
+});
+</script>
+{% endblock %}
