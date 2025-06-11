@@ -17,7 +17,7 @@
 ### 1. Yêu cầu hệ thống
 
 - Python 3.8+
-- PostgreSQL 12+
+- MySQL
 - Git
 
 ### 2. Tải về và cài đặt
@@ -37,20 +37,17 @@ venv\Scripts\activate
 source venv/bin/activate
 
 # Cài đặt dependencies
-pip install -r requirements.txt
+pip install -r dependencies.txt
 ```
 
 ### 3. Cấu hình cơ sở dữ liệu
 
-```bash
-# Tạo database PostgreSQL
-createdb beauty_app
+# MySQL:
 
-# Hoặc sử dụng psql:
-psql -U postgres
 CREATE DATABASE beauty_app;
 \q
-```
+
+````
 
 ### 4. Cấu hình biến môi trường
 
@@ -58,7 +55,7 @@ Sao chép file `.env.example` thành `.env` và cập nhật thông tin:
 
 ```bash
 cp .env.example .env
-```
+````
 
 Chỉnh sửa file `.env` với thông tin của bạn (xem chi tiết bên dưới).
 
@@ -136,16 +133,6 @@ beauty-analytics/
 ```
 
 ## 🛠️ Troubleshooting
-
-### Lỗi Database Connection
-
-```bash
-# Kiểm tra PostgreSQL đang chạy
-sudo service postgresql status
-
-# Khởi động PostgreSQL
-sudo service postgresql start
-```
 
 ### Lỗi Face++ API
 

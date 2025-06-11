@@ -5,8 +5,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash
-from app import db
-from models import User, Product, Category, Order, OrderItem, Review, BlogPost, BlogComment, SkinAnalysis, ChatMessage
+from extensions import db  # Nhập db từ extensions
 from forms import LoginForm, RegisterForm, SkinAnalysisForm, ProductForm, ReviewForm, BlogPostForm, CheckoutForm, ChatForm
 from face_analysis import face_analyzer
 
@@ -36,6 +35,8 @@ def save_uploaded_file(file):
 # Main routes
 @main_bp.route('/')
 def index():
+    from models import Product, BlogPost  # Nhập mô hình trong hàm
+    
     # Get featured products
     featured_products = Product.query.filter_by(is_active=True).limit(8).all()
     
@@ -49,6 +50,7 @@ def index():
 @main_bp.route('/skin-analysis', methods=['GET', 'POST'])
 @login_required
 def skin_analysis():
+    from models import SkinAnalysis, Product  # Nhập mô hình trong hàm
     form = SkinAnalysisForm()
     
     if form.validate_on_submit():
@@ -82,6 +84,7 @@ def skin_analysis():
 @main_bp.route('/analysis-results/<int:analysis_id>')
 @login_required
 def analysis_results(analysis_id):
+    from models import SkinAnalysis, Product  # Nhập mô hình trong hàm
     analysis = SkinAnalysis.query.filter_by(id=analysis_id, user_id=current_user.id).first_or_404()
     
     # Get recommended products based on skin type
@@ -97,6 +100,7 @@ def analysis_results(analysis_id):
 @main_bp.route('/profile')
 @login_required
 def profile():
+    from models import SkinAnalysis, Order, Review  # Nhập mô hình trong hàm
     user_analyses = SkinAnalysis.query.filter_by(user_id=current_user.id).order_by(SkinAnalysis.date_analyzed.desc()).all()
     user_orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.date_created.desc()).all()
     user_reviews = Review.query.filter_by(user_id=current_user.id).order_by(Review.date_created.desc()).all()
@@ -109,6 +113,7 @@ def profile():
 # Authentication routes
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    from models import User  # Nhập mô hình trong hàm
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     
@@ -126,6 +131,7 @@ def login():
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
+    from models import User  # Nhập mô hình trong hàm
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     
@@ -168,6 +174,7 @@ def logout():
 # Product routes
 @products_bp.route('/')
 def index():
+    from models import Product, Category  # Nhập mô hình trong hàm
     page = request.args.get('page', 1, type=int)
     category_id = request.args.get('category')
     skin_type = request.args.get('skin_type')
@@ -199,6 +206,7 @@ def index():
 
 @products_bp.route('/<int:product_id>')
 def detail(product_id):
+    from models import Product, Review  # Nhập mô hình trong hàm
     product = Product.query.get_or_404(product_id)
     reviews = Review.query.filter_by(product_id=product_id).order_by(Review.date_created.desc()).all()
     
@@ -220,6 +228,7 @@ def detail(product_id):
 @products_bp.route('/<int:product_id>/add-to-cart', methods=['POST'])
 @login_required
 def add_to_cart(product_id):
+    from models import Product  # Nhập mô hình trong hàm
     product = Product.query.get_or_404(product_id)
     quantity = int(request.form.get('quantity', 1))
     
@@ -241,6 +250,7 @@ def add_to_cart(product_id):
 @products_bp.route('/<int:product_id>/review', methods=['POST'])
 @login_required
 def add_review(product_id):
+    from models import Product, Review  # Nhập mô hình trong hàm
     product = Product.query.get_or_404(product_id)
     form = ReviewForm()
     
@@ -265,6 +275,7 @@ def add_review(product_id):
 
 @main_bp.route('/cart')
 def cart():
+    from models import Product  # Nhập mô hình trong hàm
     cart_items = []
     total = 0
     
@@ -285,6 +296,7 @@ def cart():
 @main_bp.route('/checkout', methods=['GET', 'POST'])
 @login_required
 def checkout():
+    from models import Product, Order, OrderItem  # Nhập mô hình trong hàm
     if 'cart' not in session or not session['cart']:
         flash('Giỏ hàng của bạn đang trống.', 'warning')
         return redirect(url_for('main.cart'))
@@ -350,6 +362,7 @@ def checkout():
 @chat_bp.route('/')
 @login_required
 def index():
+    from models import ChatMessage  # Nhập mô hình trong hàm
     # Get user's chat history
     messages = ChatMessage.query.filter_by(user_id=current_user.id).order_by(ChatMessage.date_created.asc()).all()
     form = ChatForm()
@@ -358,6 +371,7 @@ def index():
 @chat_bp.route('/send', methods=['POST'])
 @login_required
 def send_message():
+    from models import ChatMessage  # Nhập mô hình trong hàm
     form = ChatForm()
     if form.validate_on_submit():
         # Save user message
@@ -448,6 +462,7 @@ Hãy cho tôi biết bạn quan tâm đến vấn đề gì nhé!"""
 # Blog routes
 @blog_bp.route('/')
 def index():
+    from models import BlogPost  # Nhập mô hình trong hàm
     page = request.args.get('page', 1, type=int)
     posts = BlogPost.query.filter_by(is_published=True).order_by(BlogPost.date_created.desc()).paginate(
         page=page, per_page=6, error_out=False
@@ -456,6 +471,7 @@ def index():
 
 @blog_bp.route('/<int:post_id>')
 def post_detail(post_id):
+    from models import BlogPost, BlogComment  # Nhập mô hình trong hàm
     post = BlogPost.query.get_or_404(post_id)
     
     # Increment views
@@ -479,6 +495,7 @@ def post_detail(post_id):
 @blog_bp.route('/<int:post_id>/comment', methods=['POST'])
 @login_required
 def add_comment(post_id):
+    from models import BlogPost, BlogComment  # Nhập mô hình trong hàm
     post = BlogPost.query.get_or_404(post_id)
     content = request.form.get('content')
     
@@ -497,6 +514,7 @@ def add_comment(post_id):
 @blog_bp.route('/create', methods=['GET', 'POST'])
 @login_required
 def create_post():
+    from models import BlogPost  # Nhập mô hình trong hàm
     form = BlogPostForm()
     
     if form.validate_on_submit():

@@ -1,9 +1,16 @@
-from app import db
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logging.debug("Starting models.py")
+from sqlalchemy.orm import clear_mappers
+clear_mappers()
+logging.debug("Cleared mappers")
+from extensions import db
 from flask_login import UserMixin
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(UserMixin, db.Model):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -27,12 +34,14 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
 class Category(db.Model):
+    __tablename__ = 'category'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     products = db.relationship('Product', backref='category', lazy=True)
 
 class Product(db.Model):
+    __tablename__ = 'product'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text)
@@ -57,6 +66,7 @@ class Product(db.Model):
         return 0
 
 class SkinAnalysis(db.Model):
+    __tablename__ = 'skin_analysis'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     image_url = db.Column(db.String(500))
@@ -67,6 +77,7 @@ class SkinAnalysis(db.Model):
     date_analyzed = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Order(db.Model):
+    __tablename__ = 'order'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     total_amount = db.Column(db.Float, nullable=False)
@@ -82,6 +93,7 @@ class Order(db.Model):
     order_items = db.relationship('OrderItem', backref='order', lazy=True, cascade='all, delete-orphan')
 
 class OrderItem(db.Model):
+    __tablename__ = 'order_item'
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
@@ -89,6 +101,7 @@ class OrderItem(db.Model):
     price = db.Column(db.Float, nullable=False)  # Price at time of purchase
 
 class Review(db.Model):
+    __tablename__ = 'review'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
@@ -99,6 +112,7 @@ class Review(db.Model):
     is_verified_purchase = db.Column(db.Boolean, default=False)
 
 class BlogPost(db.Model):
+    __tablename__ = 'blog_post'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
@@ -115,6 +129,7 @@ class BlogPost(db.Model):
     comments = db.relationship('BlogComment', backref='post', lazy=True, cascade='all, delete-orphan')
 
 class BlogComment(db.Model):
+    __tablename__ = 'blog_comment'
     id = db.Column(db.Integer, primary_key=True)
     post_id = db.Column(db.Integer, db.ForeignKey('blog_post.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -125,6 +140,7 @@ class BlogComment(db.Model):
     user = db.relationship('User', backref='blog_comments')
 
 class ChatMessage(db.Model):
+    __tablename__ = 'chat_message'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     message = db.Column(db.Text, nullable=False)

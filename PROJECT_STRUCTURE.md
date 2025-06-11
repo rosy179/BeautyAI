@@ -56,11 +56,13 @@ beauty-analytics/
 ## 📋 Mô tả chi tiết các files
 
 ### 🔧 Files cấu hình
+
 - **`.env.example`**: Template cho file `.env` với tất cả biến môi trường cần thiết
 - **`dependencies.txt`**: Danh sách Python packages cần cài đặt
 - **`deploy_config.py`**: Tự động detect và cấu hình database (Supabase/Local/Heroku)
 
 ### 🐍 Python files chính
+
 - **`main.py`**: Entry point - chạy file này để start server
 - **`app.py`**: Khởi tạo Flask app, database, login manager
 - **`models.py`**: Định nghĩa database tables (User, Product, Order, etc.)
@@ -69,18 +71,21 @@ beauty-analytics/
 - **`face_analysis.py`**: Tích hợp Face++ API cho phân tích da
 
 ### 🎨 Frontend files
+
 - **`static/css/beauty.css`**: Styles chính với Bootstrap theme
 - **`static/js/main.js`**: JavaScript utilities và interactions
 - **`static/js/chat.js`**: Chat functionality với AI
 - **`static/js/skin-analysis.js`**: Camera capture và skin analysis
 
 ### 🌐 Templates
+
 - **`base.html`**: Layout chung với navigation, footer
 - **`skin_analysis.html`**: Trang phân tích da với camera và upload
 - **`products.html`**: E-commerce product listing
 - **`chat.html`**: AI beauty consultation chatbot
 
 ### 🗄️ Database
+
 - Hỗ trợ cả Supabase (cloud) và PostgreSQL local
 - Auto-migration khi chạy lần đầu
 - Sample data với sản phẩm mỹ phẩm Việt Nam
@@ -88,17 +93,20 @@ beauty-analytics/
 ## 🚀 Cách download và chạy
 
 ### Bước 1: Download project
+
 Tải toàn bộ thư mục `beauty-analytics/` về máy tính
 
 ### Bước 2: Cài đặt dependencies
+
 ```bash
 cd beauty-analytics
-python -m venv venv
+python -3.11 -m venv venv
 venv\Scripts\activate  # Windows
 pip install -r dependencies.txt
 ```
 
 ### Bước 3: Cấu hình database
+
 ```bash
 # Tạo file .env từ mẫu
 cp .env.example .env
@@ -106,12 +114,14 @@ cp .env.example .env
 ```
 
 ### Bước 4: Khởi tạo database
+
 ```bash
 python -c "from app import app, db; app.app_context().push(); db.create_all()"
 python seed_data.py  # Tạo dữ liệu mẫu
 ```
 
 ### Bước 5: Chạy server
+
 ```bash
 python run_local.py
 # Hoặc
@@ -123,11 +133,13 @@ Truy cập: http://localhost:5000
 ## 🔑 API Keys cần thiết
 
 ### Bắt buộc:
+
 - **FACEPP_API_KEY**: Đăng ký tại faceplusplus.com
 - **FACEPP_API_SECRET**: Từ Face++ dashboard
 - **DATABASE_URL**: Supabase hoặc PostgreSQL local
 
 ### Tùy chọn:
+
 - **STRIPE_SECRET_KEY**: Cho thanh toán online
 - **OPENAI_API_KEY**: Cho chat AI nâng cao
 
@@ -156,12 +168,15 @@ python-dotenv==1.0.0      # Environment variables
 ## 🔧 Customization
 
 ### Thêm sản phẩm mới:
+
 Chỉnh sửa `seed_data.py` hoặc thêm qua admin panel
 
 ### Thay đổi giao diện:
+
 Chỉnh sửa `static/css/beauty.css` và templates
 
 ### Thêm tính năng mới:
+
 1. Thêm route trong `routes.py`
 2. Tạo template mới trong `templates/`
 3. Thêm JavaScript nếu cần trong `static/js/`
