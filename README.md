@@ -47,15 +47,13 @@ pip install -r dependencies.txt
 CREATE DATABASE beauty_app;
 \q
 
-````
-
 ### 4. Cấu hình biến môi trường
 
 Sao chép file `.env.example` thành `.env` và cập nhật thông tin:
 
 ```bash
 cp .env.example .env
-````
+```
 
 Chỉnh sửa file `.env` với thông tin của bạn (xem chi tiết bên dưới).
 
@@ -71,8 +69,8 @@ python seed_data.py
 
 ### 6. Chạy ứng dụng
 
-```bash
 # Development mode
+
 python main.py
 
 Ứng dụng sẽ chạy tại: http://localhost:5000
@@ -85,6 +83,7 @@ python main.py
 2. Đăng ký tài khoản miễn phí
 3. Tạo ứng dụng và lấy API Key & API Secret
 4. Thêm vào file `.env`:
+
 ```
 
 FACEPP_API_KEY=your_api_key_here
@@ -98,6 +97,7 @@ FACEPP_API_SECRET=your_api_secret_here
 2. Đăng ký tài khoản
 3. Lấy Secret Key từ Dashboard
 4. Thêm vào file `.env`:
+
 ```
 
 STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
@@ -109,9 +109,11 @@ STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
 1. Truy cập: https://platform.openai.com
 2. Tạo API Key
 3. Thêm vào file `.env`:
+
 ```
 
 OPENAI_API_KEY=your_openai_api_key
+```
 
 ## 📁 Cấu trúc thư mục
 
