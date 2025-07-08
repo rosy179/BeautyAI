@@ -113,8 +113,6 @@ STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
 
 OPENAI_API_KEY=your_openai_api_key
 
-```
-
 ## 📁 Cấu trúc thư mục
 
 ```
@@ -167,4 +165,3 @@ beautyAI/
 3. Commit changes
 4. Push to branch
 5. Tạo Pull Request
-```
