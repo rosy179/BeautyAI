@@ -217,10 +217,11 @@ Run this after setting up the database to have demo data
 """
 
 import logging
-from app import app
+from app import create_app
 from extensions import db  # Nhập db từ extensions.py
 from werkzeug.security import generate_password_hash
 
+app = create_app()
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 

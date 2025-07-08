@@ -152,7 +152,7 @@
                     <div class="card border-0">
                         <div class="card-body">
                             {% if product.description %}
-                            <p>{{ product.description|nl2br }}</p>
+                            <p>{{ product.description }}</p>
                             {% else %}
                             <p class="text-muted">Chưa có mô tả chi tiết cho sản phẩm này.</p>
                             {% endif %}
@@ -166,7 +166,7 @@
                     <div class="card border-0">
                         <div class="card-body">
                             <h6>Thành phần chính:</h6>
-                            <p>{{ product.ingredients|nl2br }}</p>
+                            <p>{{ product.ingredients }}</p>
                         </div>
                     </div>
                 </div>
@@ -231,7 +231,7 @@
                                     <h6 class="mt-2">{{ review.title }}</h6>
                                     {% endif %}
                                     
-                                    <p class="mb-0">{{ review.content|nl2br }}</p>
+                                    <p class="mb-0">{{ review.content }}</p>
                                     
                                     {% if review.is_verified_purchase %}
                                     <small class="text-success">

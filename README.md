@@ -24,8 +24,8 @@
 
 ```bash
 # Clone repository
-git clone <your-repository-url>
-cd beauty-analytics
+git clone <repository-url>
+cd beautyAI
 
 # Tạo môi trường ảo
 python -m venv venv
