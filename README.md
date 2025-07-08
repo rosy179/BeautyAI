@@ -24,7 +24,7 @@
 
 ```bash
 # Clone repository
-git clone <repository-url>
+git clone <my-repository-url>
 cd beautyAI
 
 # Tạo môi trường ảo
@@ -62,8 +62,8 @@ Chỉnh sửa file `.env` với thông tin của bạn (xem chi tiết bên dư�
 ### 5. Khởi tạo database
 
 ```bash
-# Chạy migrations
-python -c "from app import app, db; app.app_context().push(); db.create_all()"
+# Test kết nối database
+python test_mysql.py
 
 # Thêm dữ liệu mẫu (tùy chọn)
 python seed_data.py
@@ -75,10 +75,6 @@ python seed_data.py
 # Development mode
 python main.py
 
-# Hoặc với gunicorn (production)
-gunicorn --bind 0.0.0.0:5000 main:app
-```
-
 Ứng dụng sẽ chạy tại: http://localhost:5000
 
 ## 🔧 Cấu hình API Keys
@@ -89,10 +85,12 @@ gunicorn --bind 0.0.0.0:5000 main:app
 2. Đăng ký tài khoản miễn phí
 3. Tạo ứng dụng và lấy API Key & API Secret
 4. Thêm vào file `.env`:
-   ```
-   FACEPP_API_KEY=your_api_key_here
-   FACEPP_API_SECRET=your_api_secret_here
-   ```
+```
+
+FACEPP_API_KEY=your_api_key_here
+FACEPP_API_SECRET=your_api_secret_here
+
+```
 
 ### Stripe Payment (Thanh toán)
 
@@ -100,36 +98,44 @@ gunicorn --bind 0.0.0.0:5000 main:app
 2. Đăng ký tài khoản
 3. Lấy Secret Key từ Dashboard
 4. Thêm vào file `.env`:
-   ```
-   STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
-   ```
+```
+
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+
+```
 
 ### OpenAI API (Chatbot - Tùy chọn)
 
 1. Truy cập: https://platform.openai.com
 2. Tạo API Key
 3. Thêm vào file `.env`:
-   ```
-   OPENAI_API_KEY=your_openai_api_key
-   ```
+```
+
+OPENAI_API_KEY=your_openai_api_key
+
+```
 
 ## 📁 Cấu trúc thư mục
 
 ```
-beauty-analytics/
-├── app.py              # Khởi tạo Flask app
-├── main.py             # Entry point
-├── models.py           # Database models
-├── routes.py           # API endpoints
-├── forms.py            # Form definitions
-├── face_analysis.py    # Face++ integration
-├── static/             # CSS, JS, images
-│   ├── css/
-│   ├── js/
-│   └── uploads/
-├── templates/          # HTML templates
-├── instance/           # Database files
-└── requirements.txt    # Python dependencies
+
+beautyAI/
+├── app.py # Khởi tạo Flask app
+├── extensions.py # Khởi tạo SQLAlchemy
+├── main.py # Entry point
+├── models.py # Database models
+├── routes.py # API endpoints
+├── forms.py # Form definitions
+├── face_analysis.py # Face++ integration
+├── test_mysql.py # Test database connection
+├── static/ # CSS, JS, images
+│ ├── css/
+│ ├── js/
+│ └── uploads/
+├── templates/ # HTML templates
+├── instance/ # Database files
+└── requirements.txt # Python dependencies
+
 ```
 
 ## 🛠️ Troubleshooting
@@ -153,14 +159,6 @@ beauty-analytics/
 - **Flask-Login**: Quản lý đăng nhập
 - **Requests**: HTTP client cho API calls
 - **Gunicorn**: WSGI server
-- **psycopg2**: PostgreSQL adapter
-
-## 🔒 Bảo mật
-
-- Không commit file `.env` lên Git
-- Sử dụng HTTPS trong production
-- Thường xuyên cập nhật dependencies
-- Sử dụng secret key mạnh cho Flask session
 
 ## 🤝 Đóng góp
 
@@ -169,11 +167,4 @@ beauty-analytics/
 3. Commit changes
 4. Push to branch
 5. Tạo Pull Request
-
-## 📄 License
-
-MIT License - xem file LICENSE để biết chi tiết.
-
-## 📞 Hỗ trợ
-
-Nếu gặp vấn đề, vui lòng tạo issue trên GitHub hoặc liên hệ qua email.
+```
