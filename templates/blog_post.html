@@ -137,8 +137,8 @@
                 
                 <!-- Post Content -->
                 <div class="post-content mb-5">
-                    <div class="content-body">
-                        {{ post.content|nl2br|safe }}
+                    <div class="content-body text-light">
+                        {{ post.content|safe }}
                     </div>
                 </div>
                 
@@ -206,7 +206,7 @@
                                 </small>
                             </div>
                             <div class="comment-content">
-                                {{ comment.content|nl2br|safe }}
+                                {{ comment.content|safe }}
                             </div>
                         </div>
                         {% endfor %}

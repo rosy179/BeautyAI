@@ -10,11 +10,6 @@ env/
 .venv/
 env.bak/
 
-# IDEs and editors
-.vscode/
-.idea/
-*.swp
-
 # Log files
 *.log
 
@@ -31,6 +26,4 @@ instance/
 .env
 *.env
 
-# macOS, Windows
-.DS_Store
-Thumbs.db
+static/
