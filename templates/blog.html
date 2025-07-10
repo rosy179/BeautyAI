@@ -15,15 +15,32 @@
     </div>
     
     <!-- Blog Actions -->
-    {% if current_user.is_authenticated %}
-    <div class="row mb-4">
-        <div class="col text-end">
-            <a href="{{ url_for('blog.create_post') }}" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Viết bài mới
-            </a>
+     <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-6 w-90">
+                    <input type="text" name="search" class="form-control" placeholder="Tìm kiếm bài viết..." value="{{ search_query or '' }}">
+                </div>                
+                <div class="col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search me-1"></i>Tìm kiếm
+                    </button>
+                    <a href="{{ url_for('blog.index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i>Xóa
+                    </a>
+                </div>
+                {% if current_user.is_authenticated %}
+                <div class="row mb-4">
+                    <div class="col text-end">
+                        <a href="{{ url_for('blog.create_post') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Viết bài mới
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </form>
         </div>
-    </div>
-    {% endif %}
+     </div>
     
     <!-- Blog Posts -->
     {% if posts.items %}
