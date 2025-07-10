@@ -42,7 +42,7 @@ pip install -r dependencies.txt
 
 ### 3. Cấu hình cơ sở dữ liệu
 
-# MySQL:
+## MySQL:
 
 CREATE DATABASE beauty_app;
 \q
@@ -69,7 +69,7 @@ python seed_data.py
 
 ### 6. Chạy ứng dụng
 
-# Development mode
+## Development mode
 
 python main.py
 
@@ -134,7 +134,7 @@ beautyAI/
 │ └── uploads/
 ├── templates/ # HTML templates
 ├── instance/ # Database files
-└── requirements.txt # Python dependencies
+└── dependencies.txt # Python dependencies
 
 ```
 
@@ -158,7 +158,6 @@ beautyAI/
 - **SQLAlchemy**: ORM database
 - **Flask-Login**: Quản lý đăng nhập
 - **Requests**: HTTP client cho API calls
-- **Gunicorn**: WSGI server
 
 ## 🤝 Đóng góp
 
