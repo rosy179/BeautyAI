@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if is_create %}Tạo sản phẩm mới{% else %}{{ product.name }}{% endif %} - Beauty App
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-6 mb-3">
+                <i class="fas fa-shopping-bag me-2 text-primary"></i>
+                {% if is_create %}Tạo sản phẩm mới{% else %}{{ product.name }}{% endif %}
+            </h1>
+            <p class="lead text-muted">Quản lý sản phẩm mỹ phẩm của bạn</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.name.label(class="form-label") }}
+                    {{ form.name(class="form-control", placeholder="Tên sản phẩm") }}
+                    {% if form.name.errors %}
+                    <div class="invalid-feedback d-block">{{ form.name.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.description.label(class="form-label") }}
+                    {{ form.description(class="form-control", rows=3, placeholder="Mô tả sản phẩm") }}
+                    {% if form.description.errors %}
+                    <div class="invalid-feedback d-block">{{ form.description.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.price.label(class="form-label") }}
+                    {{ form.price(class="form-control", placeholder="Giá sản phẩm") }}
+                    {% if form.price.errors %}
+                    <div class="invalid-feedback d-block">{{ form.price.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.brand.label(class="form-label") }}
+                    {{ form.brand(class="form-control", placeholder="Thương hiệu sản phẩm") }}
+                    {% if form.brand.errors %}
+                    <div class="invalid-feedback d-block">{{ form.brand.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.stock_quantity.label(class="form-label") }}
+                    {{ form.stock_quantity(class="form-control", placeholder="Số lượng trong kho") }}
+                    {% if form.stock_quantity.errors %}
+                    <div class="invalid-feedback d-block">{{ form.stock_quantity.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.ingredients.label(class="form-label") }}
+                    {{ form.ingredients(class="form-control", rows=3, placeholder="Thành phần sản phẩm") }}
+                    {% if form.ingredients.errors %}
+                    <div class="invalid-feedback d-block">{{ form.ingredients.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.category_id.label(class="form-label") }}
+                    {{ form.category_id(class="form-select") }}
+                    {% if form.category_id.errors %}
+                    <div class="invalid-feedback d-block">{{ form.category_id.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.skin_type.label(class="form-label") }}
+                    {{ form.skin_type(class="form-select") }}
+                    {% if form.skin_type.errors %}
+                    <div class="invalid-feedback d-block">{{ form.skin_type.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    {{ form.image_url.label(class="form-label") }}
+                    {{ form.image_url(class="form-control") }}
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Thêm sản phẩm
+                    </button>
+                    <a href="{{ url_for('products.index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i>Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
