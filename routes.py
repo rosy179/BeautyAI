@@ -277,28 +277,24 @@ def add_review(product_id):
 @login_required
 def create_product():
     from models import Product, Category
+    form = ProductForm()
+    categories = Category.query.all()
+    form.category_id.choices = [(c.id, c.name) for c in categories]
     if not current_user.is_admin:
         flash('Bạn không có quyền truy cập trang này.', 'danger')
         return redirect(url_for('main.index'))
-    form = ProductForm()
     if form.validate_on_submit():
-        # Save uploaded image
-        image_file = form.image.data
-        image_path = save_uploaded_file(image_file)
-        
-        if not image_path:
-            flash('Có lỗi khi tải ảnh lên. Vui lòng thử lại.', 'error')
-            return render_template('products/create_product.html', form=form)
-        
         # Create new product
         product = Product(
             name=form.name.data,
             description=form.description.data,
             price=form.price.data,
-            category_id=form.category.data.id,
+            brand=form.brand.data,
+            stock_quantity=form.stock_quantity.data,
+            ingredients=form.ingredients.data,            
+            category_id=form.category_id.data,
             skin_type=form.skin_type.data,
-            image_url=image_path,
-            is_active=form.is_active.data
+            image_url=form.image_url.data,
         )
         
         db.session.add(product)
@@ -306,7 +302,7 @@ def create_product():
         
         flash('Sản phẩm đã được tạo thành công!', 'success')
         return redirect(url_for('products.detail', product_id=product.id))
-    return render_template('products/create_product.html', form=form)
+    return render_template('product_post.html', form=form, is_create=True)
 
 @main_bp.route('/cart')
 def cart():
