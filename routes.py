@@ -502,7 +502,19 @@ def index():
     posts = BlogPost.query.filter_by(is_published=True).order_by(BlogPost.date_created.desc()).paginate(
         page=page, per_page=6, error_out=False
     )
-    return render_template('blog.html', posts=posts)
+    search_query = request.args.get('search')
+    if search_query:
+        posts = BlogPost.query.filter(
+            BlogPost.is_published == True,
+            (BlogPost.title.contains(search_query) | BlogPost.content.contains(search_query))
+        ).order_by(BlogPost.date_created.desc()).paginate(
+            page=page, per_page=6, error_out=False
+        )
+    else:
+        posts = BlogPost.query.filter_by(is_published=True).order_by(BlogPost.date_created.desc()).paginate(
+            page=page, per_page=6, error_out=False
+        )
+    return render_template('blog.html', posts=posts, search_query=search_query)
 
 @blog_bp.route('/<int:post_id>')
 def post_detail(post_id):
