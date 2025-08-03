@@ -1,4 +1,4 @@
-# Beauty Analytics - Ứng dụng Phân tích Da và Mỹ phẩm
+# BeautyAI - Ứng dụng Phân tích Da và Mỹ phẩm
 
 Ứng dụng web toàn diện cho phân tích da, tư vấn sản phẩm mỹ phẩm và thương mại điện tử được xây dựng bằng Flask.
 
@@ -160,9 +160,12 @@ beautyAI/
 - **Requests**: HTTP client cho API calls
 
 ## 🤝 Đóng góp
-
 1. Fork repository
 2. Tạo feature branch
 3. Commit changes
 4. Push to branch
 5. Tạo Pull Request
+
+## 📽️ Video Demo
+
+[![Demo Video](https://img.youtube.com/vi/0ILMeBvXkZ4/0.jpg)](https://youtu.be/0ILMeBvXkZ4)
