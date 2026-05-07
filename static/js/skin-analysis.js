@@ -680,16 +680,218 @@ function createSimpleCameraInterface() {
     modal.show();
 }
 
-// Export functions for use in other modules
-window.SkinAnalysis = {
-    validateImageFile,
-    previewImage,
-    removePreview,
-    showError,
-    showSuccess,
-    getSkinTypeAdvice,
-    setupCameraCapture
+// Visual Analysis Map Rendering
+const initVisualMap = () => {
+    // Only run on results page
+    if (!document.getElementById('analyzedImage') || !document.getElementById('skinLabels')) return;
+    
+    const img = document.getElementById('analyzedImage');
+    if (img) {
+        if (img.complete) {
+            renderVisualAnalysis();
+        } else {
+            img.addEventListener('load', renderVisualAnalysis);
+        }
+    }
 };
 
-// Make test function globally available
-window.testCameraFeature = testCameraFeature;
+window.addEventListener('load', initVisualMap);
+// Also run it immediately just in case the load event already fired
+initVisualMap();
+
+window.addEventListener('resize', () => {
+    if (document.getElementById('analyzedImage')?.complete) {
+        renderVisualAnalysis();
+    }
+});
+
+function renderVisualAnalysis() {
+    try {
+        const img = document.getElementById('analyzedImage');
+        const svg = document.getElementById('analysisSvg');
+        const markersContainer = document.getElementById('analysisMarkers');
+        const labelsContainer = document.getElementById('skinLabels');
+        const data = window.skinAnalysisData;
+
+        if (!img || !svg || !data || !labelsContainer) {
+            console.warn('Missing required elements for visual map rendering');
+            return;
+        }
+
+        if (img.naturalWidth === 0) {
+            console.warn('Image not fully loaded yet');
+            return; // Wait for load event
+        }
+
+        // Clear previous elements
+        svg.innerHTML = '';
+        markersContainer.innerHTML = '';
+        labelsContainer.innerHTML = '';
+
+        const imgWidth = img.clientWidth;
+        const imgHeight = img.clientHeight;
+        const naturalWidth = img.naturalWidth;
+        const naturalHeight = img.naturalHeight;
+
+        const scaleX = imgWidth / naturalWidth;
+        const scaleY = imgHeight / naturalHeight;
+
+        const concerns = [
+            { key: 'acne', label: 'Mụn trứng cá', icon: 'fa-certificate' },
+            { key: 'forehead_wrinkle', label: 'Nếp nhăn trán', icon: 'fa-lines-leaning' },
+            { key: 'eye_finelines', label: 'Vết chân chim', icon: 'fa-eye' },
+            { key: 'dark_circle', label: 'Quầng thâm mắt', icon: 'fa-circle-dot' },
+            { key: 'skin_spot', label: 'Đốm nâu/Nám', icon: 'fa-bullseye' },
+            { key: 'blackhead', label: 'Mụn đầu đen', icon: 'fa-dot-circle' },
+            { key: 'nasolabial_fold', label: 'Rãnh cười', icon: 'fa-smile' }
+        ];
+
+        let foundAny = false;
+
+        concerns.forEach((item, index) => {
+            try {
+                const itemData = data[item.key];
+                
+                // Some fields are just objects with 'value', some are arrays of rectangles
+                let hasIssue = false;
+                if (itemData !== undefined && itemData !== null) {
+                    if (typeof itemData === 'object' && itemData.value > 0) hasIssue = true;
+                    if (Array.isArray(itemData) && itemData.length > 0) hasIssue = true;
+                }
+
+                if (hasIssue) {
+                    foundAny = true;
+                    
+                    // Robust function to recursively find coordinate data in Face++ response
+                    function findCoordinate(obj) {
+                        if (!obj || typeof obj !== 'object') return null;
+                        if ('top' in obj && 'left' in obj && 'width' in obj && 'height' in obj) return obj;
+                        if (obj.rectangle) return obj.rectangle;
+                        
+                        for (let k in obj) {
+                            if (typeof obj[k] === 'object') {
+                                const res = findCoordinate(obj[k]);
+                                if (res) return res;
+                            }
+                        }
+                        return null;
+                    }
+
+                    // Determine coordinate
+                    let x = null, y = null;
+                    const rect = findCoordinate(itemData);
+                    
+                    if (rect) {
+                        x = (rect.left + rect.width / 2) * scaleX;
+                        y = (rect.top + rect.height / 2) * scaleY;
+                    }
+                    
+                    // If no exact coordinate, default to a smart fallback location based on concern type
+                    if (x === null || y === null || isNaN(x) || isNaN(y)) {
+                        // Place them roughly where they usually appear
+                        const defaultPositions = {
+                            'acne': { x: 0.3, y: 0.6 },
+                            'forehead_wrinkle': { x: 0.5, y: 0.2 },
+                            'eye_finelines': { x: 0.2, y: 0.45 },
+                            'dark_circle': { x: 0.35, y: 0.5 },
+                            'skin_spot': { x: 0.25, y: 0.65 },
+                            'blackhead': { x: 0.5, y: 0.65 },
+                            'nasolabial_fold': { x: 0.35, y: 0.75 }
+                        };
+                        const pos = defaultPositions[item.key] || { x: 0.5, y: 0.5 };
+                        x = imgWidth * pos.x + (Math.random() * 20 - 10);
+                        y = imgHeight * pos.y + (Math.random() * 20 - 10);
+                    }
+
+                    // Create Marker
+                    const marker = document.createElement('div');
+                    marker.className = 'analysis-marker';
+                    marker.style.left = `${x}px`;
+                    marker.style.top = `${y}px`;
+                    marker.id = `marker-${item.key}`;
+                    markersContainer.appendChild(marker);
+
+                    // Create Label
+                    const labelItem = document.createElement('div');
+                    labelItem.className = 'skin-label-item animate-fade-in-right';
+                    labelItem.style.animationDelay = `${index * 0.1}s`;
+                    labelItem.innerHTML = `
+                        <div class="skin-label-icon"><i class="fas ${item.icon}"></i></div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold small">${item.label}</div>
+                            <div class="text-muted" style="font-size: 0.7rem;">AI phát hiện</div>
+                        </div>
+                        <i class="fas fa-chevron-right text-muted small ms-2"></i>
+                    `;
+                    labelsContainer.appendChild(labelItem);
+
+                    // Draw Line (Leader line)
+                    const drawLine = () => {
+                        const svgRect = svg.getBoundingClientRect();
+                        const markerRect = marker.getBoundingClientRect();
+                        const labelRect = labelItem.getBoundingClientRect();
+
+                        // Fallback if elements not visible
+                        if (svgRect.width === 0 || markerRect.width === 0 || labelRect.width === 0) return;
+
+                        // Start from marker center
+                        const startX = markerRect.left + markerRect.width / 2 - svgRect.left;
+                        const startY = markerRect.top + markerRect.height / 2 - svgRect.top;
+
+                        // End at label left edge
+                        const endX = labelRect.left - svgRect.left - 5;
+                        const endY = labelRect.top + labelRect.height / 2 - svgRect.top;
+
+                        const line = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                        
+                        // Elbow path to avoid covering the face: Diagonal out, then horizontal to text
+                        const elbowX = endX - 30; // 30px before the label
+                        line.setAttribute("d", `M ${startX} ${startY} L ${elbowX} ${endY} L ${endX} ${endY}`);
+                        line.setAttribute("class", "leader-line");
+                        svg.appendChild(line);
+                    };
+
+                    // Draw line after a tiny delay to ensure DOM is fully rendered
+                    setTimeout(drawLine, 150);
+
+                    // Hover effects
+                    labelItem.addEventListener('mouseenter', () => {
+                        labelItem.classList.add('active');
+                        marker.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                        marker.style.background = 'rgba(216, 27, 96, 0.8)';
+                        marker.style.zIndex = '30';
+                    });
+
+                    labelItem.addEventListener('mouseleave', () => {
+                        labelItem.classList.remove('active');
+                        marker.style.transform = 'translate(-50%, -50%) scale(1)';
+                        marker.style.background = 'rgba(216, 27, 96, 0.4)';
+                        marker.style.zIndex = '20';
+                    });
+                }
+            } catch (itemError) {
+                console.error(`Error processing skin concern ${item.key}:`, itemError);
+            }
+        });
+
+        if (!foundAny) {
+            labelsContainer.innerHTML = `
+                <div class="text-center p-4">
+                    <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                    <h5 class="fw-bold">Làn da khỏe mạnh!</h5>
+                    <p class="text-muted">AI không phát hiện vấn đề nổi bật nào cần đánh dấu trên bề mặt da.</p>
+                </div>
+            `;
+        }
+    } catch (err) {
+        console.error('Error rendering visual analysis:', err);
+        const labelsContainer = document.getElementById('skinLabels');
+        if (labelsContainer) {
+            labelsContainer.innerHTML = `
+                <div class="alert alert-warning m-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Không thể vẽ bản đồ chỉ dẫn do thiếu dữ liệu tọa độ từ AI.
+                </div>
+            `;
+        }
+    }
+}
