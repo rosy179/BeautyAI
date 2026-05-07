@@ -15,28 +15,59 @@ class FaceAnalyzer:
         
     def analyze_skin(self, image_path_or_url):
         """
-        Analyze skin using Face++ API
-        Returns analysis results including skin type, age, and concerns
+        Analyze skin using a combination of Face++ Detect and Skin Analyze APIs
         """
         if not self.api_key or not self.api_secret:
             logging.error("Face++ API credentials not found")
             return self._get_fallback_analysis()
             
         try:
-            # Rate limiting to prevent API errors
             self._handle_rate_limiting()
             
-            # Try Skin Analyze API first for detailed analysis
+            # Step 1: Get Age and Gender using Detect API (v3)
+            detect_data = {
+                'api_key': self.api_key,
+                'api_secret': self.api_secret,
+                'return_attributes': 'age,gender'
+            }
+            
+            base_info = {'age': 25, 'gender': 'Female'}
+            
+            response_detect = None
+            if image_path_or_url.startswith('http'):
+                detect_data['image_url'] = image_path_or_url
+                response_detect = requests.post(self.detect_url, data=detect_data, timeout=10)
+            else:
+                with open(image_path_or_url, 'rb') as image_file:
+                    files = {'image_file': image_file}
+                    response_detect = requests.post(self.detect_url, data=detect_data, files=files, timeout=10)
+            
+            if response_detect and response_detect.status_code == 200:
+                detect_result = response_detect.json()
+                if detect_result.get('faces'):
+                    attrs = detect_result['faces'][0].get('attributes', {})
+                    base_info['age'] = attrs.get('age', {}).get('value', 25)
+                    base_info['gender'] = attrs.get('gender', {}).get('value', 'Female')
+                    logging.info(f"Detect API info: Age {base_info['age']}, Gender {base_info['gender']}")
+
+            # Step 2: Get detailed skin analysis using Skin Analyze API (v1)
+            self._handle_rate_limiting()
             result = self._try_skin_analyze_api(image_path_or_url)
-            if result and result.get('success', False):
+            
+            if result and result.get('success'):
+                # Merge the accurate age/gender into the detailed skin result
+                result['age'] = base_info['age']
+                result['gender'] = base_info['gender']
                 return result
             
-            # If Skin Analyze fails, use detect API as fallback
-            logging.info("Skin Analyze API unavailable, using detect API")
-            return self._try_detect_api_fallback(image_path_or_url)
+            # If Skin Analyze fails, return fallback with the age we found
+            logging.warning("Skin Analyze API failed, returning partial results")
+            fallback = self._get_fallback_analysis()
+            fallback['age'] = base_info['age']
+            return fallback
                 
         except Exception as e:
-            logging.error(f"Error in skin analysis: {str(e)}")
+            logging.error(f"Error in hybrid skin analysis: {str(e)}")
             return self._get_fallback_analysis()
     
     def _handle_rate_limiting(self):
@@ -97,8 +128,33 @@ class FaceAnalyzer:
         else:
             skin_type = 'normal'
         
-        # Extract age estimate (fallback to 25 if not available)
-        skin_age = 25
+        # Deep debug: Print the entire result to console so we can see it
+        print("\n" + "="*50)
+        print("DEBUG: FACE++ API RESPONSE STRUCTURE")
+        print(f"Keys available: {list(result.keys())}")
+        
+        # Try to find age anywhere in the result
+        skin_age = 25 # Default
+        
+        # 1. Try standard locations
+        if 'skin_age' in result and isinstance(result['skin_age'], dict):
+            skin_age = result['skin_age'].get('value', skin_age)
+        elif 'age' in result:
+            if isinstance(result['age'], dict):
+                skin_age = result['age'].get('value', skin_age)
+            else:
+                skin_age = result['age']
+        
+        # 2. If still 25, do a quick scan of all keys for anything containing 'age'
+        if skin_age == 25:
+            for key, value in result.items():
+                if 'age' in key.lower() and isinstance(value, dict) and 'value' in value:
+                    skin_age = value['value']
+                    print(f"Found potential age in key '{key}': {skin_age}")
+                    break
+        
+        print(f"FINAL DETERMINED AGE: {skin_age}")
+        print("="*50 + "\n")
         
         # Identify skin concerns from the detailed analysis
         concerns = self._identify_concerns_from_analysis(result)
