@@ -123,12 +123,13 @@ h1, h2, h3, h4, h5, h6, .display-1, .display-2, .display-3, .display-4, .display
 
 .hero-img-blended {
     width: 100%;
-    height: auto;
-    object-fit: cover;
-    -webkit-mask-image: radial-gradient(circle, black 50%, transparent 95%);
-    mask-image: radial-gradient(circle, black 50%, transparent 95%);
+    max-height: 520px;
+    object-fit: contain;
+    object-position: center;
+    -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 85%);
+    mask-image: radial-gradient(circle at center, black 30%, transparent 85%);
     transition: all 0.5s ease;
-    filter: drop-shadow(0 20px 50px rgba(216, 27, 96, 0.2));
+    filter: drop-shadow(0 20px 50px rgba(216, 27, 96, 0.15));
 }
 
 /* .hero-img-blended:hover {

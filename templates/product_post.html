@@ -5,91 +5,172 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5 pt-4">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="display-6 mb-3">
-                <i class="fas fa-shopping-bag me-2 text-primary"></i>
-                {% if is_create %}Tạo sản phẩm mới{% else %}{{ product.name }}{% endif %}
-            </h1>
-            <p class="lead text-muted">Quản lý sản phẩm mỹ phẩm của bạn</p>
-        </div>
-    </div>
+<div class="container mt-5 pt-5 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4 animate-fade-in">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-4 me-3">
+                    <i class="fas fa-edit fa-2x text-primary"></i>
+                </div>
+                <div>
+                    <h1 class="display-6 fw-bold mb-0">
+                        {% if is_create %}Thiết lập sản phẩm mới{% else %}Chỉnh sửa: {{ product.name }}{% endif %}
+                    </h1>
+                    <p class="text-muted mb-0">Cung cấp thông tin chi tiết để sản phẩm nổi bật hơn trên cửa hàng</p>
+                </div>
+            </div>
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST" enctype="multipart/form-data" class="row g-4">
                 {{ form.hidden_tag() }}
-                <div class="mb-3">
-                    {{ form.name.label(class="form-label") }}
-                    {{ form.name(class="form-control", placeholder="Tên sản phẩm") }}
-                    {% if form.name.errors %}
-                    <div class="invalid-feedback d-block">{{ form.name.errors[0] }}</div>
-                    {% endif %}
+                
+                <!-- Left Column: Basic Info -->
+                <div class="col-md-7">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                        <div class="card-header bg-white border-0 pt-4 px-4">
+                            <h5 class="fw-bold mb-0">Thông tin cơ bản</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="mb-4">
+                                {{ form.name.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.name(class="form-control form-control-lg rounded-3", placeholder="Tên sản phẩm đầy đủ") }}
+                                {% if form.name.errors %}
+                                <div class="invalid-feedback d-block">{{ form.name.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    {{ form.brand.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                    {{ form.brand(class="form-control rounded-3", placeholder="Thương hiệu") }}
+                                    {% if form.brand.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.brand.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.category_id.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                    {{ form.category_id(class="form-select rounded-3") }}
+                                    {% if form.category_id.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.category_id.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    {{ form.price.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                    <div class="input-group">
+                                        {{ form.price(class="form-control rounded-start-3", placeholder="0") }}
+                                        <span class="input-group-text bg-light border-start-0 rounded-end-3">VNĐ</span>
+                                    </div>
+                                    {% if form.price.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.price.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.stock_quantity.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                    {{ form.stock_quantity(class="form-control rounded-3", placeholder="Số lượng kho") }}
+                                    {% if form.stock_quantity.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.stock_quantity.errors[0] }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-0">
+                                {{ form.description.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.description(class="form-control rounded-3", rows=5, placeholder="Mô tả chi tiết công dụng và cách dùng...") }}
+                                {% if form.description.errors %}
+                                <div class="invalid-feedback d-block">{{ form.description.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-3">
-                    {{ form.description.label(class="form-label") }}
-                    {{ form.description(class="form-control", rows=3, placeholder="Mô tả sản phẩm") }}
-                    {% if form.description.errors %}
-                    <div class="invalid-feedback d-block">{{ form.description.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    {{ form.price.label(class="form-label") }}
-                    {{ form.price(class="form-control", placeholder="Giá sản phẩm") }}
-                    {% if form.price.errors %}
-                    <div class="invalid-feedback d-block">{{ form.price.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    {{ form.brand.label(class="form-label") }}
-                    {{ form.brand(class="form-control", placeholder="Thương hiệu sản phẩm") }}
-                    {% if form.brand.errors %}
-                    <div class="invalid-feedback d-block">{{ form.brand.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    {{ form.stock_quantity.label(class="form-label") }}
-                    {{ form.stock_quantity(class="form-control", placeholder="Số lượng trong kho") }}
-                    {% if form.stock_quantity.errors %}
-                    <div class="invalid-feedback d-block">{{ form.stock_quantity.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    {{ form.ingredients.label(class="form-label") }}
-                    {{ form.ingredients(class="form-control", rows=3, placeholder="Thành phần sản phẩm") }}
-                    {% if form.ingredients.errors %}
-                    <div class="invalid-feedback d-block">{{ form.ingredients.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    {{ form.category_id.label(class="form-label") }}
-                    {{ form.category_id(class="form-select") }}
-                    {% if form.category_id.errors %}
-                    <div class="invalid-feedback d-block">{{ form.category_id.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    {{ form.skin_type.label(class="form-label") }}
-                    {{ form.skin_type(class="form-select") }}
-                    {% if form.skin_type.errors %}
-                    <div class="invalid-feedback d-block">{{ form.skin_type.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="mb-3">
-                    {{ form.image_url.label(class="form-label") }}
-                    {{ form.image_url(class="form-control") }}
-                </div>
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Thêm sản phẩm
-                    </button>
-                    <a href="{{ url_for('products.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-times me-2"></i>Hủy
-                    </a>
+
+                <!-- Right Column: Media & Specs -->
+                <div class="col-md-5">
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                        <div class="card-header bg-white border-0 pt-4 px-4">
+                            <h5 class="fw-bold mb-0">Hình ảnh & Đặc tính</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="mb-4">
+                                {{ form.image_url.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.image_url(class="form-control rounded-3 mb-2", onchange="previewImage(this)") }}
+                                <div id="imagePreviewContainer" class="mt-2 rounded-3 overflow-hidden border bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    {% if not is_create and product.image_url %}
+                                    <img src="{{ product.image_url }}" class="img-fluid h-100 w-100 object-fit-cover" id="currentImage">
+                                    {% else %}
+                                    <div class="text-center text-muted" id="previewPlaceholder">
+                                        <i class="fas fa-cloud-upload-alt fa-3x mb-2"></i>
+                                        <p class="small mb-0">Dán URL ảnh để xem trước</p>
+                                    </div>
+                                    <img src="" class="img-fluid h-100 w-100 object-fit-cover d-none" id="currentImage">
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                {{ form.skin_type.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.skin_type(class="form-select rounded-3") }}
+                                {% if form.skin_type.errors %}
+                                <div class="invalid-feedback d-block">{{ form.skin_type.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-0">
+                                {{ form.ingredients.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.ingredients(class="form-control rounded-3", rows=4, placeholder="Danh sách thành phần...") }}
+                                {% if form.ingredients.errors %}
+                                <div class="invalid-feedback d-block">{{ form.ingredients.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="card border-0 shadow-sm rounded-4 bg-primary bg-opacity-10">
+                        <div class="card-body p-4">
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    {% if is_create %}Đăng sản phẩm{% else %}Lưu thay đổi{% endif %}
+                                </button>
+                                <a href="{{ url_for('products.index') }}" class="btn btn-outline-secondary rounded-pill">
+                                    <i class="fas fa-times me-2"></i>Hủy bỏ
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+function previewImage(input) {
+    const url = input.value;
+    const preview = document.getElementById('currentImage');
+    const placeholder = document.getElementById('previewPlaceholder');
+    
+    if (url) {
+        preview.src = url;
+        preview.classList.remove('d-none');
+        if (placeholder) placeholder.classList.add('d-none');
+    } else {
+        preview.classList.add('d-none');
+        if (placeholder) placeholder.classList.remove('d-none');
+    }
+}
+</script>
+
+<style>
+.object-fit-cover {
+    object-fit: cover;
+}
+.tracking-wider {
+    letter-spacing: 0.05em;
+}
+</style>
 {% endblock %}

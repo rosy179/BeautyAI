@@ -175,6 +175,9 @@ def logout():
 @products_bp.route('/')
 def index():
     from models import Product, Category  # Nhập mô hình trong hàm
+    from forms import ProductForm
+    from flask_login import current_user
+    
     page = request.args.get('page', 1, type=int)
     category_id = request.args.get('category')
     skin_type = request.args.get('skin_type')
@@ -189,20 +192,31 @@ def index():
         query = query.filter((Product.skin_type == skin_type) | (Product.skin_type == 'all'))
     
     if search:
-        query = query.filter(Product.name.contains(search) | Product.description.contains(search))
+        search_terms = search.split()
+        for term in search_terms:
+            query = query.filter(
+                Product.name.ilike(f"%{term}%") | 
+                Product.description.ilike(f"%{term}%") |
+                Product.brand.ilike(f"%{term}%")
+            )
     
     products = query.order_by(Product.date_added.desc()).paginate(
         page=page, per_page=12, error_out=False
     )
     
     categories = Category.query.all()
+    form = None
+    if current_user.is_authenticated and current_user.is_admin:
+        form = ProductForm()
+        form.category_id.choices = [(c.id, c.name) for c in categories]
     
     return render_template('products.html', 
                          products=products, 
                          categories=categories,
                          current_category=category_id,
                          current_skin_type=skin_type,
-                         search_query=search)
+                         search_query=search,
+                         form=form)
 
 @products_bp.route('/<int:product_id>')
 def detail(product_id):
@@ -525,24 +539,31 @@ Hãy cho tôi biết bạn quan tâm đến vấn đề gì nhé!"""
 # Blog routes
 @blog_bp.route('/')
 def index():
-    from models import BlogPost  # Nhập mô hình trong hàm
+    from models import BlogPost
+    from forms import BlogPostForm
+    from flask_login import current_user
+    
     page = request.args.get('page', 1, type=int)
-    posts = BlogPost.query.filter_by(is_published=True).order_by(BlogPost.date_created.desc()).paginate(
+    search_query = request.args.get('search')
+    
+    query = BlogPost.query.filter_by(is_published=True)
+    
+    if search_query:
+        search_terms = search_query.split()
+        for term in search_terms:
+            query = query.filter(
+                BlogPost.title.ilike(f"%{term}%") | 
+                BlogPost.content.ilike(f"%{term}%") |
+                BlogPost.excerpt.ilike(f"%{term}%")
+            )
+            
+    posts = query.order_by(BlogPost.date_created.desc()).paginate(
         page=page, per_page=6, error_out=False
     )
-    search_query = request.args.get('search')
-    if search_query:
-        posts = BlogPost.query.filter(
-            BlogPost.is_published == True,
-            (BlogPost.title.contains(search_query) | BlogPost.content.contains(search_query))
-        ).order_by(BlogPost.date_created.desc()).paginate(
-            page=page, per_page=6, error_out=False
-        )
-    else:
-        posts = BlogPost.query.filter_by(is_published=True).order_by(BlogPost.date_created.desc()).paginate(
-            page=page, per_page=6, error_out=False
-        )
-    return render_template('blog.html', posts=posts, search_query=search_query)
+    
+    form = BlogPostForm() if current_user.is_authenticated else None
+    
+    return render_template('blog.html', posts=posts, search_query=search_query, form=form)
 
 @blog_bp.route('/<int:post_id>')
 def post_detail(post_id):

@@ -427,7 +427,7 @@
 {% if show_results and analysis.analysis_result.success %}
 <script>
     // Define global data before loading the main JS file
-    window.skinAnalysisData = {{ analysis.analysis_result.skin_analysis | tojson }};
+    window.skinAnalysisData = '{{ analysis.analysis_result.skin_analysis | tojson }}';
     window.isResultsPage = true;
 </script>
 {% endif %}

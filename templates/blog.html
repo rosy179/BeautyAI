@@ -14,33 +14,89 @@
         </div>
     </div>
     
-    <!-- Blog Actions -->
-     <div class="card mb-4">
-        <div class="card-body">
-            <form method="GET" class="row g-3">
-                <div class="col-md-6 w-90">
-                    <input type="text" name="search" class="form-control" placeholder="Tìm kiếm bài viết..." value="{{ search_query or '' }}">
-                </div>                
-                <div class="col-md-6 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary me-2">
-                        <i class="fas fa-search me-1"></i>Tìm kiếm
-                    </button>
-                    <a href="{{ url_for('blog.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-times me-1"></i>Xóa
-                    </a>
-                </div>
-                {% if current_user.is_authenticated %}
-                <div class="row mb-4">
-                    <div class="col text-end">
-                        <a href="{{ url_for('blog.create_post') }}" class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>Viết bài mới
-                        </a>
+    <!-- Blog Actions: Search & Write -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5 overflow-hidden animate-fade-in">
+        <div class="card-body p-4 p-lg-5 bg-white">
+            <form method="GET" class="row g-4 align-items-center">
+                <div class="col-md-9">
+                    <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden border">
+                        <span class="input-group-text bg-white border-0 ps-4">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" name="search" class="form-control border-0 px-2" placeholder="Tìm kiếm kiến thức làm đẹp..." value="{{ search_query or '' }}">
                     </div>
                 </div>
-                {% endif %}
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm w-100">
+                        <i class="fas fa-search me-2"></i>Tìm
+                    </button>
+                    <a href="{{ url_for('blog.index') }}" class="btn btn-outline-secondary btn-lg rounded-pill w-100" title="Xóa tìm kiếm">
+                        <i class="fas fa-undo"></i>
+                    </a>
+                </div>
             </form>
         </div>
-     </div>
+    </div>
+
+    <!-- Floating Action Button for Writing Post -->
+    {% if current_user.is_authenticated %}
+    <div class="position-fixed bottom-0 end-0 m-4 z-3">
+        <button type="button" class="btn btn-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center" 
+                style="width: 60px; height: 60px;" data-bs-toggle="modal" data-bs-target="#createPostModal" title="Viết bài mới">
+            <i class="fas fa-pen-nib fa-lg"></i>
+        </button>
+    </div>
+
+    <!-- Create Post Modal -->
+    <div class="modal fade" id="createPostModal" tabindex="-1" aria-labelledby="createPostModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                <div class="modal-header border-0 pt-4 px-4 bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="createPostModalLabel">
+                        <i class="fas fa-edit me-2"></i>Viết bài blog mới
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form action="{{ url_for('blog.create_post') }}" method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                            {{ form.title(class="form-control rounded-3", placeholder="Tiêu đề bài viết hấp dẫn") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.featured_image.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                            {{ form.featured_image(class="form-control rounded-3", placeholder="URL hình ảnh tiêu đề") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.excerpt.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                            {{ form.excerpt(class="form-control rounded-3", rows=2, placeholder="Tóm tắt ngắn gọn nội dung bài viết...") }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.content.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                            {{ form.content(class="form-control rounded-3", rows=6, placeholder="Nội dung chi tiết bài viết...") }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.tags.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                            {{ form.tags(class="form-control rounded-3", placeholder="Ví dụ: skincare, makeup, tips (cách nhau bằng dấu phẩy)") }}
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                                <i class="fas fa-paper-plane me-2"></i>Đăng bài viết
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     
     <!-- Blog Posts -->
     {% if posts.items %}

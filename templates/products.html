@@ -14,18 +14,27 @@
         </div>
     </div>
     
-    <!-- Filters -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="GET" class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label">Tìm kiếm</label>
-                    <input type="text" name="search" class="form-control" placeholder="Tên sản phẩm..." value="{{ search_query or '' }}">
+    <!-- Filters & Search -->
+    <div class="card border-0 shadow-sm rounded-4 mb-5 overflow-hidden animate-fade-in">
+        <div class="card-body p-4 p-lg-5 bg-white">
+            <form method="GET" class="row g-4 align-items-end">
+                <div class="col-lg-4">
+                    <label class="form-label fw-bold small text-uppercase tracking-wider text-muted mb-2">
+                        <i class="fas fa-search me-2 text-primary"></i>Tìm kiếm sản phẩm
+                    </label>
+                    <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden border">
+                        <span class="input-group-text bg-white border-0 ps-4">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" name="search" class="form-control border-0 px-2" placeholder="Tên, thương hiệu..." value="{{ search_query or '' }}">
+                    </div>
                 </div>
                 
-                <div class="col-md-3">
-                    <label class="form-label">Danh mục</label>
-                    <select name="category" class="form-select">
+                <div class="col-sm-6 col-lg-3">
+                    <label class="form-label fw-bold small text-uppercase tracking-wider text-muted mb-2">
+                        <i class="fas fa-layer-group me-2 text-primary"></i>Danh mục
+                    </label>
+                    <select name="category" class="form-select form-select-lg shadow-sm rounded-pill border">
                         <option value="">Tất cả danh mục</option>
                         {% for category in categories %}
                         <option value="{{ category.id }}" {% if current_category == category.id|string %}selected{% endif %}>
@@ -35,9 +44,11 @@
                     </select>
                 </div>
                 
-                <div class="col-md-3">
-                    <label class="form-label">Loại da</label>
-                    <select name="skin_type" class="form-select">
+                <div class="col-sm-6 col-lg-3">
+                    <label class="form-label fw-bold small text-uppercase tracking-wider text-muted mb-2">
+                        <i class="fas fa-user-circle me-2 text-primary"></i>Loại da
+                    </label>
+                    <select name="skin_type" class="form-select form-select-lg shadow-sm rounded-pill border">
                         <option value="">Tất cả loại da</option>
                         <option value="oily" {% if current_skin_type == 'oily' %}selected{% endif %}>Da dầu</option>
                         <option value="dry" {% if current_skin_type == 'dry' %}selected{% endif %}>Da khô</option>
@@ -47,24 +58,97 @@
                     </select>
                 </div>
                 
-                <div class="col-md-3 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary me-2">
-                        <i class="fas fa-search me-1"></i>Lọc
+                <div class="col-lg-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm w-100">
+                        <i class="fas fa-filter me-2"></i>Lọc
                     </button>
-                    <a href="{{ url_for('products.index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-times me-1"></i>Xóa
+                    <a href="{{ url_for('products.index') }}" class="btn btn-outline-secondary btn-lg rounded-pill w-100" title="Xóa lọc">
+                        <i class="fas fa-undo"></i>
                     </a>
                 </div>
-                {% if current_user.is_admin %}
-                <div class="col-md-12 text-end">
-                    <a href="{{ url_for('products.create_product') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Thêm sản phẩm mới
-                    </a>
-                </div>
-                {% endif %}
             </form>
         </div>
     </div>
+
+    <!-- Admin Floating Action Button -->
+    {% if current_user.is_authenticated and current_user.is_admin %}
+    <div class="position-fixed bottom-0 end-0 m-4 z-3">
+        <button type="button" class="btn btn-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center" 
+                style="width: 60px; height: 60px;" data-bs-toggle="modal" data-bs-target="#addProductModal" title="Thêm sản phẩm mới">
+            <i class="fas fa-plus fa-lg"></i>
+        </button>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                <div class="modal-header border-0 pt-4 px-4 bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="addProductModalLabel">
+                        <i class="fas fa-plus-circle me-2"></i>Thêm sản phẩm mới
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form action="{{ url_for('products.create_product') }}" method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                {{ form.name.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.name(class="form-control rounded-3", placeholder="Tên sản phẩm đầy đủ") }}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                {{ form.brand.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.brand(class="form-control rounded-3", placeholder="Thương hiệu") }}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                {{ form.category_id.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.category_id(class="form-select rounded-3") }}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                {{ form.price.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                <div class="input-group">
+                                    {{ form.price(class="form-control rounded-start-3", placeholder="0") }}
+                                    <span class="input-group-text bg-light border-start-0 rounded-end-3">VNĐ</span>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                {{ form.stock_quantity.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.stock_quantity(class="form-control rounded-3", placeholder="Số lượng kho") }}
+                            </div>
+
+                            <div class="col-md-12">
+                                {{ form.image_url.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.image_url(class="form-control rounded-3", placeholder="URL hình ảnh sản phẩm") }}
+                            </div>
+
+                            <div class="col-md-6">
+                                {{ form.skin_type.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.skin_type(class="form-select rounded-3") }}
+                            </div>
+
+                            <div class="col-md-12">
+                                {{ form.description.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.description(class="form-control rounded-3", rows=3, placeholder="Mô tả công dụng...") }}
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+                                <i class="fas fa-check-circle me-2"></i>Đăng sản phẩm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     
     <!-- Products Grid -->
     {% if products.items %}
