@@ -347,7 +347,7 @@ class FaceAnalyzer:
         
         # Additional treatments based on concerns
         if 'acne' in concerns:
-            routine['evening'].append('Điều trị mụn spot treatment')
+            routine['evening'].append('Sản phẩm chấm mụn đặc trị')
             
         if 'dark_spots' in concerns:
             routine['evening'].insert(3, 'Serum làm sáng da')

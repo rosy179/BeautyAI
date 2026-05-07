@@ -97,7 +97,7 @@ function previewImage(file) {
             <div class="card">
                 <div class="card-body p-2">
                     <div class="d-flex align-items-center">
-                        <img src="${e.target.result}" alt="Preview" class="preview-image me-3" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                        <img src="${e.target.result}" alt="Xem trước" class="preview-image me-3" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
                         <div class="flex-grow-1">
                             <h6 class="mb-1">${file.name}</h6>
                             <small class="text-muted">${formatFileSize(file.size)}</small>

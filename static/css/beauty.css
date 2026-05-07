@@ -375,6 +375,50 @@ body {
     border-bottom: none;
 }
 
+/* Cart Styles */
+.cart-item {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    margin-bottom: 0.5rem;
+}
+
+.cart-item:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.quantity-controls .input-group {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.quantity-controls .form-control {
+    background: transparent;
+    border: none;
+    color: white;
+    font-weight: bold;
+}
+
+.quantity-controls .btn {
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.quantity-controls .btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.summary-item {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.summary-total {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
 /* Checkout Styles */
 .checkout-steps {
     margin: 2rem 0;

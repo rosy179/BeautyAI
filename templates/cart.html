@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Giỏ hàng - Beauty App{% endblock %}
+{% block title %}Giỏ hàng - BeautyAI{% endblock %}
 
 {% block content %}
 <div class="container mt-5 pt-4">
@@ -49,11 +49,11 @@
                                 <!-- Quantity Controls -->
                                 <div class="quantity-controls me-3">
                                     <div class="input-group" style="width: 120px;">
-                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ item.product.id }}, -1)">
+                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity('{{ item.product.id }}', -1)">
                                             <i class="fas fa-minus"></i>
                                         </button>
                                         <input type="text" class="form-control text-center" value="{{ item.quantity }}" readonly>
-                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ item.product.id }}, 1)">
+                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity('{{ item.product.id }}', 1)">
                                             <i class="fas fa-plus"></i>
                                         </button>
                                     </div>
@@ -66,7 +66,7 @@
                                 
                                 <!-- Remove Button -->
                                 <div class="remove-item">
-                                    <button class="btn btn-outline-danger btn-sm" onclick="removeFromCart({{ item.product.id }})">
+                                    <button class="btn btn-outline-danger btn-sm" onclick="removeFromCart('{{ item.product.id }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
@@ -159,15 +159,53 @@
 {% block scripts %}
 <script>
 function updateQuantity(productId, change) {
-    // This would normally make an AJAX request to update quantity
-    // For now, we'll show an alert
-    alert('Tính năng cập nhật số lượng sẽ được triển khai với AJAX trong phiên bản tiếp theo.');
+    fetch('{{ url_for("products.update_cart") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            change: change
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Có lỗi xảy ra khi cập nhật giỏ hàng.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra khi kết nối máy chủ.');
+    });
 }
 
 function removeFromCart(productId) {
     if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
-        // This would normally make an AJAX request to remove item
-        alert('Tính năng xóa sản phẩm sẽ được triển khai với AJAX trong phiên bản tiếp theo.');
+        fetch('{{ url_for("products.remove_from_cart") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || 'Có lỗi xảy ra khi xóa sản phẩm.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi kết nối máy chủ.');
+        });
     }
 }
 

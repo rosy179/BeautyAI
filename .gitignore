@@ -25,5 +25,17 @@ instance/
 # Environment variables
 .env
 *.env
+.env.*
 
-static/
+# Media and Uploads
+static/uploads/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db

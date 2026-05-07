@@ -171,8 +171,13 @@
                                             {% for concern in analysis.skin_concerns %}
                                             <span class="badge bg-warning text-dark me-1">
                                                 {% if concern == 'acne' %}Mụn
-                                                {% elif concern == 'dark_spots' %}Đốm đen
-                                                {% elif concern == 'dryness' %}Da khô
+                                                {% elif concern == 'blackheads' %}Mụn đầu đen
+                                                {% elif concern == 'dark_circles' %}Quầng thâm
+                                                {% elif concern == 'dark_spots' %}Đốm nâu
+                                                {% elif concern == 'wrinkles' %}Nếp nhăn
+                                                {% elif concern == 'large_pores' %}Lỗ chân lông to
+                                                {% elif concern == 'healthy_skin' %}Da khỏe mạnh
+                                                {% elif concern == 'dryness' %}Da khô ráp
                                                 {% else %}{{ concern }}{% endif %}
                                             </span>
                                             {% endfor %}

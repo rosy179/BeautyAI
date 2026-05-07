@@ -247,6 +247,38 @@ def add_to_cart(product_id):
     flash(f'Đã thêm {product.name} vào giỏ hàng!', 'success')
     return redirect(url_for('products.detail', product_id=product_id))
 
+@products_bp.route('/update-cart', methods=['POST'])
+def update_cart():
+    product_id = request.json.get('product_id')
+    change = request.json.get('change')
+    
+    if 'cart' not in session:
+        return jsonify({'success': False, 'message': 'Giỏ hàng không tồn tại'})
+    
+    product_key = str(product_id)
+    if product_key in session['cart']:
+        session['cart'][product_key] += change
+        if session['cart'][product_key] <= 0:
+            del session['cart'][product_key]
+        
+        session.modified = True
+        return jsonify({'success': True})
+    
+    return jsonify({'success': False, 'message': 'Sản phẩm không có trong giỏ hàng'})
+
+@products_bp.route('/remove-from-cart', methods=['POST'])
+def remove_from_cart():
+    product_id = request.json.get('product_id')
+    
+    if 'cart' in session:
+        product_key = str(product_id)
+        if product_key in session['cart']:
+            del session['cart'][product_key]
+            session.modified = True
+            return jsonify({'success': True})
+            
+    return jsonify({'success': False, 'message': 'Sản phẩm không có trong giỏ hàng'})
+
 @products_bp.route('/<int:product_id>/review', methods=['POST'])
 @login_required
 def add_review(product_id):

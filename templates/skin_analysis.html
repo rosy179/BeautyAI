@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Phân tích da AI - Beauty App{% endblock %}
+{% block title %}Phân tích da Trí tuệ nhân tạo - BeautyAI{% endblock %}
 
 {% block content %}
 <div class="container mt-5 pt-4">
@@ -11,7 +11,7 @@
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-primary text-white text-center py-4">
                     <h2 class="mb-0">
-                        <i class="fas fa-camera me-2"></i>Phân tích da với AI
+                        <i class="fas fa-camera me-2"></i>Phân tích da với Trí tuệ nhân tạo
                     </h2>
                     <p class="mb-0 mt-2">Sử dụng công nghệ Face++ để phân tích chính xác tình trạng làn da</p>
                 </div>
@@ -136,7 +136,7 @@
                 <div class="results-hero text-center mb-5">
                     <div class="position-relative z-index-2">
                         <h1 class="display-4 fw-bold text-white mb-2">Kết quả phân tích da</h1>
-                        <p class="lead text-white-50">Dựa trên công nghệ AI tiên tiến, đây là báo cáo chi tiết về làn da của bạn</p>
+                        <p class="lead text-white-50">Dựa trên công nghệ trí tuệ nhân tạo tiên tiến, đây là báo cáo chi tiết về làn da của bạn</p>
                         <div class="mt-4">
                             <span class="badge bg-white text-primary px-3 py-2 rounded-pill shadow-sm">
                                 <i class="fas fa-calendar-check me-2"></i>Cập nhật: {{ analysis.date_analyzed.strftime('%d/%m/%Y') }}
@@ -181,8 +181,13 @@
                                     {% for concern in analysis.skin_concerns %}
                                     <span class="badge bg-soft-warning text-warning border border-warning-subtle">
                                         {% if concern == 'acne' %}Mụn
+                                        {% elif concern == 'blackheads' %}Mụn đầu đen
+                                        {% elif concern == 'dark_circles' %}Quầng thâm
                                         {% elif concern == 'dark_spots' %}Đốm nâu
-                                        {% elif concern == 'dryness' %}Khô ráp
+                                        {% elif concern == 'wrinkles' %}Nếp nhăn
+                                        {% elif concern == 'large_pores' %}Lỗ chân lông to
+                                        {% elif concern == 'healthy_skin' %}Da khỏe mạnh
+                                        {% elif concern == 'dryness' %}Da khô ráp
                                         {% else %}{{ concern }}{% endif %}
                                     </span>
                                     {% endfor %}
