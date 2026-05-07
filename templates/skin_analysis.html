@@ -133,12 +133,12 @@
             <!-- Premium Analysis Results Overhaul -->
             <div class="results-container animate-fade-in-up">
                 <!-- Hero Header -->
-                <div class="results-hero text-center mb-5 p-5 rounded-5 shadow-sm bg-white bg-opacity-50 border border-primary border-opacity-10">
+                <div class="results-hero text-center mb-5 p-5 rounded-5 shadow-lg" style="background: var(--premium-gradient);">
                     <div class="position-relative z-index-2">
-                        <h1 class="display-4 fw-bold text-primary mb-2">Kết quả phân tích da</h1>
-                        <p class="lead text-muted">Dựa trên công nghệ trí tuệ nhân tạo tiên tiến, đây là báo cáo chi tiết về làn da của bạn</p>
+                        <h1 class="display-4 fw-bold text-white mb-2">Kết quả phân tích da</h1>
+                        <p class="lead text-white-50">Dựa trên công nghệ trí tuệ nhân tạo tiên tiến, đây là báo cáo chi tiết về làn da của bạn</p>
                         <div class="mt-4">
-                            <span class="badge bg-primary text-white px-3 py-2 rounded-pill shadow-sm">
+                            <span class="badge bg-white text-primary px-4 py-2 rounded-pill shadow-sm fw-bold">
                                 <i class="fas fa-calendar-check me-2"></i>Cập nhật: {{ analysis.date_analyzed.strftime('%d/%m/%Y') }}
                             </span>
                         </div>
@@ -276,8 +276,8 @@
                 {% endif %}
 
                 <!-- Action Buttons -->
-                <div class="text-center py-4 gap-3 d-flex justify-content-center">
-                    <a href="{{ url_for('main.skin_analysis') }}" class="btn btn-outline-light btn-lg px-5 rounded-pill glass-card hover-lift">
+                <div class="d-flex justify-content-center gap-4 py-5">
+                    <a href="{{ url_for('main.skin_analysis') }}" class="btn btn-outline-primary btn-lg px-5 rounded-pill hover-lift bg-white shadow-sm">
                         <i class="fas fa-redo me-2"></i>Phân tích lại
                     </a>
                     <a href="{{ url_for('chat.index') }}" class="btn btn-primary btn-lg px-5 rounded-pill shadow-lg hover-lift">
@@ -288,30 +288,33 @@
             
             <!-- Recommended Products -->
             {% if recommended_products %}
-            <div class="card shadow-lg border-0 mt-4">
-                <div class="card-header bg-info text-white">
-                    <h4 class="mb-0">
-                        <i class="fas fa-shopping-bag me-2"></i>Sản phẩm được gợi ý
-                    </h4>
+            <div class="mt-5 pt-4">
+                <div class="text-center mb-5">
+                    <h3 class="display-6 fw-bold text-dark">Sản phẩm được gợi ý cho bạn</h3>
+                    <div class="divider mx-auto bg-primary" style="width: 60px; height: 3px;"></div>
                 </div>
-                <div class="card-body">
+                <div class="">
                     <div class="row g-3">
                         {% for product in recommended_products %}
                         <div class="col-md-4">
-                            <div class="card h-100 border-0 shadow-sm">
-                                {% if product.image_url %}
-                                <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}" style="height: 200px; object-fit: cover;">
-                                {% else %}
-                                <div class="placeholder-image d-flex align-items-center justify-content-center" style="height: 200px;">
-                                    <i class="fas fa-image fa-3x text-muted"></i>
+                            <div class="card product-card h-100 border-0 shadow-sm bg-white overflow-hidden">
+                                <div class="position-relative">
+                                    {% if product.image_url %}
+                                    <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}" style="height: 220px; object-fit: cover;">
+                                    {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 220px;">
+                                        <i class="fas fa-image fa-3x text-muted"></i>
+                                    </div>
+                                    {% endif %}
                                 </div>
-                                {% endif %}
-                                <div class="card-body d-flex flex-column">
-                                    <h6 class="card-title">{{ product.name }}</h6>
-                                    <p class="card-text text-muted small flex-grow-1">{{ product.description[:80] }}...</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="h6 text-primary mb-0">{{ "{:,.0f}".format(product.price) }}đ</span>
-                                        <a href="{{ url_for('products.detail', product_id=product.id) }}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                                <div class="card-body d-flex flex-column p-4 text-center">
+                                    <h5 class="card-title h6 fw-bold mb-2">{{ product.name }}</h5>
+                                    <p class="text-muted small mb-3 flex-grow-1">{{ product.description[:80] }}...</p>
+                                    <div class="mt-auto">
+                                        <h6 class="text-primary fw-bold mb-3">{{ "{:,.0f}".format(product.price) }}đ</h6>
+                                        <a href="{{ url_for('products.detail', product_id=product.id) }}" class="btn btn-outline-primary rounded-pill w-100 btn-sm">
+                                            Chi tiết sản phẩm
+                                        </a>
                                     </div>
                                 </div>
                             </div>
