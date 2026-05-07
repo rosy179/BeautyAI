@@ -40,8 +40,6 @@ h1, h2, h3, h4, h5, h6, .display-1, .display-2, .display-3, .display-4, .display
 .main-content {
     padding-top: 100px;
     min-height: calc(100vh - 200px);
-    position: relative;
-    z-index: 1;
 }
 
 /* Animated Background */
@@ -806,20 +804,36 @@ h1, h2, h3, h4, h5, h6, .display-1, .display-2, .display-3, .display-4, .display
 .camera-container {
     position: relative;
     display: inline-block;
-    background: #f8f9fa;
-    border-radius: 10px;
+    background: #ffffff;
+    border-radius: 20px;
     overflow: hidden;
+    box-shadow: 0 10px 30px rgba(216, 27, 96, 0.1);
 }
 
 .face-overlay {
     pointer-events: none;
     z-index: 10;
-    opacity: 0.7;
+    opacity: 1;
+    border: 3px dashed rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3); /* Lớp phủ đen nhẹ hơn để tập trung vào khuôn mặt */
+    transition: all 0.3s ease;
 }
 
 #cameraVideo {
-    background: #000;
-    border-radius: 8px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    transform: scaleX(-1); /* Mirror effect for better user experience */
+}
+
+/* Fix for modal backdrop issue */
+.modal {
+    z-index: 1060 !important;
+}
+.modal-backdrop {
+    z-index: 1050 !important;
+}
+.camera-container {
+    z-index: 1070;
 }
 
 .camera-instructions .alert {
