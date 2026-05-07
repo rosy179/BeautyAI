@@ -29,19 +29,25 @@ def create_app():
     # Get database URL from environment
     database_url = os.environ.get("DATABASE_URL")
     
+    # AGGRESSIVE FIX: If on Render and URL is MySQL, it's definitely wrong.
+    # We will search for the correct PostgreSQL URL in other env vars.
+    if os.environ.get("RENDER") and (not database_url or "mysql" in database_url.lower()):
+        logging.warning("Detected incorrect or missing DATABASE_URL on Render. Searching for alternatives...")
+        for key, value in os.environ.items():
+            if ("postgres" in value.lower() or "postgresql" in value.lower()) and "://" in value:
+                database_url = value
+                logging.info(f"Found alternative database URL in environment variable: {key}")
+                break
+    
     if not database_url:
         raise RuntimeError("DATABASE_URL environment variable is not set")
     
     # Force PostgreSQL driver and fix prefix for Render compatibility
-    if database_url.startswith("postgres://") or database_url.startswith("postgresql://"):
-        # Ensure it starts with postgresql+psycopg2://
+    if "postgres" in database_url.lower():
         if database_url.startswith("postgres://"):
             database_url = database_url.replace("postgres://", "postgresql+psycopg2://", 1)
-        else:
+        elif database_url.startswith("postgresql://"):
             database_url = database_url.replace("postgresql://", "postgresql+psycopg2://", 1)
-    elif "mysql" in database_url.lower() and os.environ.get("RENDER"):
-        # If somehow we have a MySQL URL on Render, it's likely an error in config
-        logging.error("Detected MySQL URL on Render. This is likely incorrect.")
         
     logging.info(f"Connecting to database type: {database_url.split(':')[0]}")
     
