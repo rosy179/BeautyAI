@@ -138,16 +138,6 @@ function initializeAnimations() {
     
     // Add CSS for animations
     addAnimationStyles();
-    
-    // Parallax effect for hero section
-    const heroSection = document.querySelector('.hero-section');
-    if (heroSection) {
-        window.addEventListener('scroll', function() {
-            const scrolled = window.pageYOffset;
-            const rate = scrolled * -0.5;
-            heroSection.style.transform = `translateY(${rate}px)`;
-        });
-    }
 }
 
 // Form enhancements
@@ -479,9 +469,9 @@ function addAnimationStyles() {
         }
         
         .navbar-scrolled {
-            background-color: rgba(0, 0, 0, 0.95) !important;
+            background-color: rgba(255, 245, 248, 0.95) !important;
             backdrop-filter: blur(10px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 20px rgba(216, 27, 96, 0.1);
         }
         
         .toast-notification {
