@@ -12,7 +12,7 @@ services:
       - key: SESSION_SECRET
         generateValue: true
       - key: PYTHON_VERSION
-        value: 3.11.0
+        value: 3.11.9
 
 databases:
   - name: beauty-db
