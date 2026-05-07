@@ -8,12 +8,12 @@
         <div class="col-lg-8">
             {% if not show_results %}
             <!-- Analysis Form -->
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white text-center py-4">
-                    <h2 class="mb-0">
-                        <i class="fas fa-camera me-2"></i>Phân tích da với Trí tuệ nhân tạo
+            <div class="card shadow-lg border-0 rounded-4 glass-card">
+                <div class="card-header border-0 text-center py-4" style="background: linear-gradient(135deg, var(--beauty-primary), #ff80ab); color: white; border-radius: 1rem 1rem 0 0;">
+                    <h2 class="mb-0 fw-bold">
+                        <i class="fas fa-camera-retro me-2"></i>Phân tích da thông minh
                     </h2>
-                    <p class="mb-0 mt-2">Sử dụng công nghệ Face++ để phân tích chính xác tình trạng làn da</p>
+                    <p class="mb-0 mt-2 text-white-50">Sử dụng AI để khám phá bí mật làn da của bạn</p>
                 </div>
                 
                 <div class="card-body p-5">
@@ -21,29 +21,29 @@
                         {{ form.hidden_tag() }}
                         
                         <div class="mb-4">
-                            <label for="{{ form.skin_image.id }}" class="form-label">
-                                <i class="fas fa-image me-2"></i>Ảnh khuôn mặt *
+                            <label for="{{ form.skin_image.id }}" class="form-label fw-bold text-dark">
+                                <i class="fas fa-portrait text-primary me-2"></i>Ảnh khuôn mặt *
                             </label>
                             
                             <!-- Image upload options -->
                             <div class="upload-options mb-3">
-                                <div class="alert alert-info mb-3">
-                                    <h6><i class="fas fa-info-circle me-2"></i>Chọn cách tải ảnh:</h6>
-                                    <div class="row g-2 mt-2">
+                                <div class="alert mb-3 rounded-4" style="background-color: var(--beauty-secondary); border: 1px solid rgba(216, 27, 96, 0.2);">
+                                    <h6 class="text-primary fw-bold"><i class="fas fa-magic me-2"></i>Chọn cách tải ảnh:</h6>
+                                    <div class="row g-3 mt-2">
                                         <div class="col-md-6">
-                                            <label for="{{ form.skin_image.id }}" class="btn btn-primary w-100 btn-lg">
-                                                <i class="fas fa-upload me-2"></i>Tải ảnh từ thiết bị
-                                            </label>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <button type="button" class="btn btn-success w-100 btn-lg" id="cameraBtn">
+                                            <button type="button" class="btn btn-primary w-100 btn-lg shadow-sm rounded-pill" id="cameraBtn">
                                                 <i class="fas fa-camera me-2"></i>Chụp ảnh trực tiếp
                                             </button>
                                         </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ form.skin_image.id }}" class="btn btn-outline-primary w-100 btn-lg shadow-sm rounded-pill mb-0">
+                                                <i class="fas fa-upload me-2"></i>Tải ảnh từ thiết bị
+                                            </label>
+                                        </div>
                                     </div>
-                                    <small class="d-block mt-2 text-muted">
-                                        <i class="fas fa-lightbulb me-1"></i>
-                                        <strong>Khuyên dùng:</strong> Chụp ảnh trực tiếp để có chất lượng tốt nhất
+                                    <small class="d-block mt-3 text-muted text-center">
+                                        <i class="fas fa-lightbulb text-warning me-1"></i>
+                                        <strong>Khuyên dùng:</strong> Chụp ảnh trực tiếp, không trang điểm để AI phân tích chuẩn xác nhất.
                                     </small>
                                 </div>
                             </div>
@@ -141,6 +141,33 @@
                             <span class="badge bg-white text-primary px-4 py-2 rounded-pill shadow-sm fw-bold">
                                 <i class="fas fa-calendar-check me-2"></i>Cập nhật: {{ analysis.date_analyzed.strftime('%d/%m/%Y') }}
                             </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Skin Map Section [NEW] -->
+                <div class="row mb-5 align-items-center position-relative" id="visualMapRow">
+                    <!-- SVG Overlay spanning the entire row -->
+                    <svg id="analysisSvg" class="position-absolute top-0 start-0 w-100 h-100" style="pointer-events: none; z-index: 10; overflow: visible;"></svg>
+                    
+                    <div class="col-lg-6 mb-4 mb-lg-0">
+                        <div class="skin-map-container p-2 position-relative shadow-lg rounded-4" style="background: white;">
+                            <div class="analysis-overlay-wrapper position-relative" id="imageWrapper">
+                                <img src="/{{ analysis.image_url }}" alt="Bản đồ phân tích da" class="img-fluid rounded-4 w-100" id="analyzedImage">
+                                <div id="analysisMarkers" class="position-absolute top-0 start-0 w-100 h-100" style="pointer-events: none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="ps-lg-4">
+                            <h3 class="fw-bold mb-4 position-relative z-index-2">Chẩn đoán chi tiết</h3>
+                            <div class="skin-labels-container position-relative z-index-2" id="skinLabels">
+                                <!-- Labels will be dynamically injected here via JS -->
+                                <div class="placeholder-content p-4 text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                                    <p>Đang tải bản đồ chỉ dẫn...</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -397,5 +424,12 @@
 {% endblock %}
 
 {% block scripts %}
+{% if show_results and analysis.analysis_result.success %}
+<script>
+    // Define global data before loading the main JS file
+    window.skinAnalysisData = {{ analysis.analysis_result.skin_analysis | tojson }};
+    window.isResultsPage = true;
+</script>
+{% endif %}
 <script src="{{ url_for('static', filename='js/skin-analysis.js') }}"></script>
 {% endblock %}

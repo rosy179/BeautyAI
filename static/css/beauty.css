@@ -900,13 +900,79 @@ h1, h2, h3, h4, h5, h6, .display-1, .display-2, .display-3, .display-4, .display
         font-size: 0.875rem;
         padding: 0.5rem;
     }
-    
-    .camera-container {
-        width: 100%;
-    }
-    
-    .face-overlay {
-        width: 200px;
-        height: 240px;
-    }
+}
+
+/* Visual Skin Map Styles */
+.skin-map-container {
+    background: #fff;
+    border: 1px solid rgba(216, 27, 96, 0.1);
+}
+
+.analysis-marker {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: rgba(216, 27, 96, 0.4);
+    border: 2px solid #d81b60;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 0 10px rgba(216, 27, 96, 0.5);
+    animation: pulseMarker 2s infinite;
+}
+
+@keyframes pulseMarker {
+    0% { box-shadow: 0 0 0 0 rgba(216, 27, 96, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(216, 27, 96, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(216, 27, 96, 0); }
+}
+
+.skin-label-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    margin-bottom: 12px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.skin-label-item:hover {
+    transform: translateX(10px);
+    background: var(--beauty-secondary);
+    border-color: var(--beauty-primary);
+}
+
+.skin-label-item.active {
+    background: var(--beauty-primary);
+    color: white;
+    box-shadow: 0 4px 15px rgba(216, 27, 96, 0.3);
+}
+
+.skin-label-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--beauty-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: var(--beauty-primary);
+}
+
+.skin-label-item.active .skin-label-icon {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+.leader-line {
+    stroke: var(--beauty-primary);
+    stroke-width: 1.5;
+    fill: none;
+    opacity: 0.6;
+    stroke-dasharray: 4;
 }
