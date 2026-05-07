@@ -123,8 +123,13 @@
                             </div>
 
                             <div class="col-md-12">
+                                {{ form.image_file.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                                {{ form.image_file(class="form-control rounded-3") }}
+                            </div>
+
+                            <div class="col-md-12">
                                 {{ form.image_url.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
-                                {{ form.image_url(class="form-control rounded-3", placeholder="URL hình ảnh sản phẩm") }}
+                                {{ form.image_url(class="form-control rounded-3", placeholder="Hoặc dán URL hình ảnh sản phẩm") }}
                             </div>
 
                             <div class="col-md-6">

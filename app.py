@@ -1,5 +1,7 @@
 import os
 import logging
+import cloudinary
+import cloudinary.uploader
 from flask import Flask
 from flask_login import LoginManager
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -7,6 +9,14 @@ from dotenv import load_dotenv
 from extensions import db
 
 load_dotenv()
+
+# Configure Cloudinary
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
+    secure=True
+)
 
 def create_app():
     logging.basicConfig(level=logging.DEBUG)

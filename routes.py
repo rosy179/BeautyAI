@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash
 from extensions import db  # Nhập db từ extensions
 from forms import LoginForm, RegisterForm, SkinAnalysisForm, ProductForm, ReviewForm, BlogPostForm, CheckoutForm, ChatForm
+import cloudinary.uploader
 from face_analysis import face_analyzer
 
 # Create blueprints
@@ -18,18 +19,21 @@ blog_bp = Blueprint('blog', __name__)
 
 # Helper functions
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'webp'}
 
-def save_uploaded_file(file):
+def save_uploaded_file(file, folder="beauty_ai"):
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        filename = f"{uuid.uuid4()}_{filename}"
-        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        
-        # Create upload directory if it doesn't exist
-        os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        file.save(filepath)
-        return filepath
+        try:
+            # Upload directly to Cloudinary
+            upload_result = cloudinary.uploader.upload(
+                file,
+                folder=folder,
+                resource_type="auto"
+            )
+            return upload_result.get('secure_url')
+        except Exception as e:
+            print(f"Cloudinary upload error: {e}")
+            return None
     return None
 
 # Main routes
@@ -330,6 +334,13 @@ def create_product():
         flash('Bạn không có quyền truy cập trang này.', 'danger')
         return redirect(url_for('main.index'))
     if form.validate_on_submit():
+        # Handle product image upload
+        product_image_url = form.image_url.data
+        if form.image_file.data:
+            uploaded_url = save_uploaded_file(form.image_file.data, folder="products")
+            if uploaded_url:
+                product_image_url = uploaded_url
+
         # Create new product
         product = Product(
             name=form.name.data,
@@ -340,7 +351,7 @@ def create_product():
             ingredients=form.ingredients.data,            
             category_id=form.category_id.data,
             skin_type=form.skin_type.data,
-            image_url=form.image_url.data,
+            image_url=product_image_url,
         )
         
         db.session.add(product)
@@ -614,11 +625,18 @@ def create_post():
     form = BlogPostForm()
     
     if form.validate_on_submit():
+        # Handle blog image upload
+        blog_image_url = form.featured_image.data
+        if form.featured_image_file.data:
+            uploaded_url = save_uploaded_file(form.featured_image_file.data, folder="blog")
+            if uploaded_url:
+                blog_image_url = uploaded_url
+
         post = BlogPost(
             title=form.title.data,
             excerpt=form.excerpt.data,
             content=form.content.data,
-            featured_image=form.featured_image.data,
+            featured_image=blog_image_url,
             tags=form.tags.data,
             author_id=current_user.id,
             is_published=form.is_published.data

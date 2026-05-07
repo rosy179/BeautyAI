@@ -47,7 +47,11 @@ class ProductForm(FlaskForm):
         ('normal', 'Da thường')
     ])
     ingredients = TextAreaField('Thành phần', render_kw={'placeholder': 'Thành phần chính của sản phẩm'})
-    image_url = StringField('URL hình ảnh', render_kw={'placeholder': 'URL của ảnh sản phẩm'})
+    image_file = FileField('Tải lên ảnh sản phẩm', validators=[
+        Optional(),
+        FileAllowed(['jpg', 'jpeg', 'png', 'webp'], 'Chỉ chấp nhận file ảnh!')
+    ])
+    image_url = StringField('Hoặc nhập URL hình ảnh', render_kw={'placeholder': 'URL của ảnh sản phẩm'})
 
 class ReviewForm(FlaskForm):
     rating = SelectField('Đánh giá', choices=[(5, '5 sao - Tuyệt vời'), (4, '4 sao - Tốt'), (3, '3 sao - Bình thường'), (2, '2 sao - Kém'), (1, '1 sao - Rất kém')], coerce=int, validators=[DataRequired()])
@@ -58,7 +62,11 @@ class BlogPostForm(FlaskForm):
     title = StringField('Tiêu đề', validators=[DataRequired()], render_kw={'placeholder': 'Tiêu đề bài viết'})
     excerpt = TextAreaField('Tóm tắt', render_kw={'placeholder': 'Tóm tắt ngắn gọn về bài viết'})
     content = TextAreaField('Nội dung', validators=[DataRequired()], render_kw={'placeholder': 'Nội dung bài viết'})
-    featured_image = StringField('Ảnh đại diện', render_kw={'placeholder': 'URL ảnh đại diện cho bài viết'})
+    featured_image_file = FileField('Tải lên ảnh bài viết', validators=[
+        Optional(),
+        FileAllowed(['jpg', 'jpeg', 'png', 'webp'], 'Chỉ chấp nhận file ảnh!')
+    ])
+    featured_image = StringField('Hoặc nhập URL ảnh bài viết', render_kw={'placeholder': 'URL ảnh đại diện cho bài viết'})
     tags = StringField('Tags', render_kw={'placeholder': 'skincare, makeup, beauty (phân cách bằng dấu phẩy)'})
     is_published = BooleanField('Xuất bản ngay')
 

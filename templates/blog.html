@@ -67,8 +67,13 @@
                         </div>
                         
                         <div class="mb-3">
+                            {{ form.featured_image_file.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
+                            {{ form.featured_image_file(class="form-control rounded-3") }}
+                        </div>
+                        
+                        <div class="mb-3">
                             {{ form.featured_image.label(class="form-label fw-bold small text-uppercase tracking-wider") }}
-                            {{ form.featured_image(class="form-control rounded-3", placeholder="URL hình ảnh tiêu đề") }}
+                            {{ form.featured_image(class="form-control rounded-3", placeholder="Hoặc dán URL ảnh đại diện cho bài viết") }}
                         </div>
                         
                         <div class="mb-3">
