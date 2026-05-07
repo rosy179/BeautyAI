@@ -130,109 +130,154 @@
             </div>
             
             {% else %}
-            <!-- Analysis Results -->
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-success text-white text-center py-4">
-                    <h2 class="mb-0">
-                        <i class="fas fa-check-circle me-2"></i>Kết quả phân tích da
-                    </h2>
+            <!-- Premium Analysis Results Overhaul -->
+            <div class="results-container animate-fade-in-up">
+                <!-- Hero Header -->
+                <div class="results-hero text-center mb-5">
+                    <div class="position-relative z-index-2">
+                        <h1 class="display-4 fw-bold text-white mb-2">Kết quả phân tích da</h1>
+                        <p class="lead text-white-50">Dựa trên công nghệ AI tiên tiến, đây là báo cáo chi tiết về làn da của bạn</p>
+                        <div class="mt-4">
+                            <span class="badge bg-white text-primary px-3 py-2 rounded-pill shadow-sm">
+                                <i class="fas fa-calendar-check me-2"></i>Cập nhật: {{ analysis.date_analyzed.strftime('%d/%m/%Y') }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="card-body p-5">
-                    {% if analysis.analysis_result.success %}
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <div class="result-card p-3 bg-light rounded">
-                                <h5><i class="fas fa-user me-2 text-primary"></i>Thông tin cơ bản</h5>
-                                <p><strong>Loại da:</strong> 
-                                    <span class="badge bg-primary">
-                                        {% if analysis.skin_type == 'oily' %}Da dầu
-                                        {% elif analysis.skin_type == 'dry' %}Da khô
-                                        {% elif analysis.skin_type == 'combination' %}Da hỗn hợp
-                                        {% elif analysis.skin_type == 'sensitive' %}Da nhạy cảm
-                                        {% else %}Da thường{% endif %}
-                                    </span>
-                                </p>
+
+                {% if analysis.analysis_result.success %}
+                <!-- Analysis Summary Stats -->
+                <div class="row g-4 mb-5">
+                    <div class="col-md-4">
+                        <div class="glass-card stat-card h-100">
+                            <div class="stat-icon"><i class="fas fa-fingerprint"></i></div>
+                            <h6 class="text-muted text-uppercase small ls-1">Loại da</h6>
+                            <h3 class="fw-bold mb-0">
+                                {% if analysis.skin_type == 'oily' %}Da dầu
+                                {% elif analysis.skin_type == 'dry' %}Da khô
+                                {% elif analysis.skin_type == 'combination' %}Da hỗn hợp
+                                {% elif analysis.skin_type == 'sensitive' %}Da nhạy cảm
+                                {% else %}Da thường{% endif %}
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card stat-card h-100">
+                            <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                            <h6 class="text-muted text-uppercase small ls-1">Độ tuổi da</h6>
+                            <h3 class="fw-bold mb-0">
                                 {% if analysis.analysis_result.age %}
-                                <p><strong>Độ tuổi ước tính:</strong> {{ analysis.analysis_result.age }} tuổi</p>
+                                {{ analysis.analysis_result.age }} tuổi
+                                {% else %}N/A{% endif %}
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card stat-card h-100">
+                            <div class="stat-icon"><i class="fas fa-shield-virus"></i></div>
+                            <h6 class="text-muted text-uppercase small ls-1">Tình trạng chính</h6>
+                            <div class="mt-2 d-flex flex-wrap justify-content-center gap-1">
+                                {% if analysis.skin_concerns %}
+                                    {% for concern in analysis.skin_concerns %}
+                                    <span class="badge bg-soft-warning text-warning border border-warning-subtle">
+                                        {% if concern == 'acne' %}Mụn
+                                        {% elif concern == 'dark_spots' %}Đốm nâu
+                                        {% elif concern == 'dryness' %}Khô ráp
+                                        {% else %}{{ concern }}{% endif %}
+                                    </span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="badge bg-soft-success text-success border border-success-subtle">Khỏe mạnh</span>
                                 {% endif %}
                             </div>
                         </div>
-                        
+                    </div>
+                </div>
+
+                <!-- Recommended Routine Section -->
+                <div class="routine-section mb-5">
+                    <h3 class="fw-bold mb-4 d-flex align-items-center">
+                        <i class="fas fa-magic me-3 text-primary"></i>Lộ trình chăm sóc đề xuất
+                    </h3>
+                    
+                    <div class="row g-4">
+                        <!-- Morning Routine -->
                         <div class="col-md-6">
-                            {% if analysis.skin_concerns %}
-                            <div class="result-card p-3 bg-light rounded">
-                                <h5><i class="fas fa-exclamation-triangle me-2 text-warning"></i>Vấn đề da</h5>
-                                {% for concern in analysis.skin_concerns %}
-                                <span class="badge bg-warning text-dark me-1 mb-1">
-                                    {% if concern == 'acne' %}Mụn trứng cá
-                                    {% elif concern == 'dark_spots' %}Đốm đen
-                                    {% elif concern == 'dryness' %}Da khô
-                                    {% else %}{{ concern }}{% endif %}
-                                </span>
-                                {% endfor %}
+                            <div class="glass-card p-4 h-100 routine-morning border-top-0 border-end-0 border-bottom-0">
+                                <div class="routine-header">
+                                    <div class="icon-circle bg-warning text-white shadow-warning">
+                                        <i class="fas fa-sun"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Chu trình Buổi sáng</h5>
+                                </div>
+                                <div class="routine-steps">
+                                    {% for step in analysis.recommended_routine.morning %}
+                                    <div class="step-item">
+                                        <div class="step-number-badge text-white">{{ loop.index }}</div>
+                                        <span>{{ step }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
                             </div>
-                            {% endif %}
+                        </div>
+
+                        <!-- Evening Routine -->
+                        <div class="col-md-6">
+                            <div class="glass-card p-4 h-100 routine-evening border-top-0 border-end-0 border-bottom-0">
+                                <div class="routine-header">
+                                    <div class="icon-circle bg-info text-white shadow-info">
+                                        <i class="fas fa-moon"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-0">Chu trình Buổi tối</h5>
+                                </div>
+                                <div class="routine-steps">
+                                    {% for step in analysis.recommended_routine.evening %}
+                                    <div class="step-item">
+                                        <div class="step-number-badge text-white">{{ loop.index }}</div>
+                                        <span>{{ step }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- Skincare Routine -->
-                    <div class="skincare-routine mb-4">
-                        <h4><i class="fas fa-spa me-2 text-success"></i>Lộ trình chăm sóc da được đề xuất</h4>
-                        
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <div class="routine-card p-3 border rounded">
-                                    <h6><i class="fas fa-sun me-2 text-warning"></i>Buổi sáng</h6>
-                                    <ol class="mb-0">
-                                        {% for step in analysis.recommended_routine.morning %}
-                                        <li>{{ step }}</li>
-                                        {% endfor %}
-                                    </ol>
-                                </div>
+                </div>
+                
+                {% if analysis.recommended_routine.weekly %}
+                <div class="glass-card p-4 mb-5 border-primary border-opacity-25">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center">
+                        <i class="fas fa-calendar-alt me-2 text-primary"></i>Chăm sóc hàng tuần
+                    </h5>
+                    <div class="row g-2">
+                        {% for step in analysis.recommended_routine.weekly %}
+                        <div class="col-md-6">
+                            <div class="p-3 rounded bg-white bg-opacity-5 d-flex align-items-center">
+                                <i class="fas fa-check-circle text-primary me-3"></i>
+                                <span>{{ step }}</span>
                             </div>
-                            
-                            <div class="col-md-4 mb-3">
-                                <div class="routine-card p-3 border rounded">
-                                    <h6><i class="fas fa-moon me-2 text-info"></i>Buổi tối</h6>
-                                    <ol class="mb-0">
-                                        {% for step in analysis.recommended_routine.evening %}
-                                        <li>{{ step }}</li>
-                                        {% endfor %}
-                                    </ol>
-                                </div>
-                            </div>
-                            
-                            {% if analysis.recommended_routine.weekly %}
-                            <div class="col-md-4 mb-3">
-                                <div class="routine-card p-3 border rounded">
-                                    <h6><i class="fas fa-calendar-week me-2 text-primary"></i>Hàng tuần</h6>
-                                    <ul class="mb-0">
-                                        {% for step in analysis.recommended_routine.weekly %}
-                                        <li>{{ step }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            </div>
-                            {% endif %}
                         </div>
+                        {% endfor %}
                     </div>
-                    
-                    {% else %}
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        {{ analysis.analysis_result.error }}
-                    </div>
-                    {% endif %}
-                    
-                    <div class="text-center">
-                        <a href="{{ url_for('main.skin_analysis') }}" class="btn btn-outline-primary me-2">
-                            <i class="fas fa-redo me-2"></i>Phân tích lại
-                        </a>
-                        <a href="{{ url_for('chat.index') }}" class="btn btn-info">
-                            <i class="fas fa-comments me-2"></i>Tư vấn thêm
-                        </a>
-                    </div>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <div class="glass-card p-5 text-center my-5">
+                    <div class="stat-icon text-danger"><i class="fas fa-exclamation-circle"></i></div>
+                    <h3 class="text-danger mb-3">Phân tích thất bại</h3>
+                    <p class="text-muted">{{ analysis.analysis_result.error }}</p>
+                    <a href="{{ url_for('main.skin_analysis') }}" class="btn btn-primary px-4 py-2 mt-3">Thử lại</a>
+                </div>
+                {% endif %}
+
+                <!-- Action Buttons -->
+                <div class="text-center py-4 gap-3 d-flex justify-content-center">
+                    <a href="{{ url_for('main.skin_analysis') }}" class="btn btn-outline-light btn-lg px-5 rounded-pill glass-card hover-lift">
+                        <i class="fas fa-redo me-2"></i>Phân tích lại
+                    </a>
+                    <a href="{{ url_for('chat.index') }}" class="btn btn-primary btn-lg px-5 rounded-pill shadow-lg hover-lift">
+                        <i class="fas fa-comment-medical me-2"></i>Tư vấn với AI
+                    </a>
                 </div>
             </div>
             
