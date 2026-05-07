@@ -8,7 +8,9 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from dotenv import load_dotenv
 from extensions import db
 
-load_dotenv()
+# Only load .env if not running on Render
+if not os.environ.get("RENDER"):
+    load_dotenv()
 
 # Configure Cloudinary
 cloudinary.config(
@@ -24,17 +26,24 @@ def create_app():
     app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-production")
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     
-    # Priority: 1. Render/System Env, 2. .env file
+    # Get database URL from environment
     database_url = os.environ.get("DATABASE_URL")
     
     if not database_url:
         raise RuntimeError("DATABASE_URL environment variable is not set")
     
-    # Fix for Render/Heroku PostgreSQL URL: replace 'postgres://' with 'postgresql://'
-    if database_url.startswith("postgres://"):
-        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    # Force PostgreSQL driver and fix prefix for Render compatibility
+    if database_url.startswith("postgres://") or database_url.startswith("postgresql://"):
+        # Ensure it starts with postgresql+psycopg2://
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql+psycopg2://", 1)
+        else:
+            database_url = database_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    elif "mysql" in database_url.lower() and os.environ.get("RENDER"):
+        # If somehow we have a MySQL URL on Render, it's likely an error in config
+        logging.error("Detected MySQL URL on Render. This is likely incorrect.")
         
-    logging.info(f"Using database type: {database_url.split(':')[0]}")
+    logging.info(f"Connecting to database type: {database_url.split(':')[0]}")
     
     app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
