@@ -53,6 +53,12 @@ class FaceAnalyzer:
                     return self._get_fallback_analysis()
             
             try:
+                # Lấy kích thước ảnh thực tế để frontend scale tọa độ chính xác
+                from PIL import Image
+                with Image.open(image_path_or_url) as img:
+                    analysis_width, analysis_height = img.size
+                logging.info(f"Analyzed image size: {analysis_width}x{analysis_height}")
+
                 # Step 1: Get Age and Gender using Detect API (v3)
                 detect_data = {
                     'api_key': self.api_key,
@@ -77,6 +83,10 @@ class FaceAnalyzer:
                 # Step 2: Get detailed skin analysis using Skin Analyze API (v1)
                 self._handle_rate_limiting()
                 result = self._try_skin_analyze_api(image_path_or_url)
+                
+                if result:
+                    result['analysis_width'] = analysis_width
+                    result['analysis_height'] = analysis_height
             finally:
                 # Dọn dẹp file tạm
                 if is_temp and temp_file_path and os.path.exists(temp_file_path):

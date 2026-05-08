@@ -730,11 +730,13 @@ function renderVisualAnalysis() {
 
         const imgWidth = img.clientWidth;
         const imgHeight = img.clientHeight;
-        const naturalWidth = img.naturalWidth;
-        const naturalHeight = img.naturalHeight;
+        
+        // Use analysis dimensions from server if available, otherwise fallback to natural dimensions
+        const analysisWidth = data.analysis_width || img.naturalWidth;
+        const analysisHeight = data.analysis_height || img.naturalHeight;
 
-        const scaleX = imgWidth / naturalWidth;
-        const scaleY = imgHeight / naturalHeight;
+        const scaleX = imgWidth / analysisWidth;
+        const scaleY = imgHeight / analysisHeight;
 
         const concerns = [
             { key: 'acne', label: 'Mụn trứng cá', icon: 'fa-certificate' },
