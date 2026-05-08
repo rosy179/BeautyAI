@@ -21,38 +21,69 @@ class FaceAnalyzer:
             logging.error("Face++ API credentials not found")
             return self._get_fallback_analysis()
             
+        # Tối ưu hóa kích thước ảnh nếu là link Cloudinary để tránh lỗi quá 2MB của Face++
+        if isinstance(image_path_or_url, str) and 'res.cloudinary.com' in image_path_or_url and '/upload/' in image_path_or_url:
+            if '/upload/w_' not in image_path_or_url: # Tránh transform 2 lần
+                image_path_or_url = image_path_or_url.replace('/upload/', '/upload/w_800,c_limit,q_auto/')
+                
         try:
             self._handle_rate_limiting()
             
-            # Step 1: Get Age and Gender using Detect API (v3)
-            detect_data = {
-                'api_key': self.api_key,
-                'api_secret': self.api_secret,
-                'return_attributes': 'age,gender'
-            }
+            # Tải ảnh từ URL về file tạm để gửi dạng image_file (Face++ đôi khi chặn hoặc lỗi khi dùng image_url)
+            temp_file_path = None
+            is_temp = False
             
-            base_info = {'age': 25, 'gender': 'Female'}
-            
-            response_detect = None
             if image_path_or_url.startswith('http'):
-                detect_data['image_url'] = image_path_or_url
-                response_detect = requests.post(self.detect_url, data=detect_data, timeout=10)
-            else:
+                import tempfile
+                import uuid
+                
+                temp_dir = tempfile.gettempdir()
+                temp_file_path = os.path.join(temp_dir, f"temp_face_{uuid.uuid4().hex}.jpg")
+                
+                # Tải ảnh về
+                response = requests.get(image_path_or_url, stream=True)
+                if response.status_code == 200:
+                    with open(temp_file_path, 'wb') as f:
+                        for chunk in response.iter_content(1024):
+                            f.write(chunk)
+                    is_temp = True
+                    image_path_or_url = temp_file_path
+                else:
+                    logging.error(f"Could not download image from {image_path_or_url}")
+                    return self._get_fallback_analysis()
+            
+            try:
+                # Step 1: Get Age and Gender using Detect API (v3)
+                detect_data = {
+                    'api_key': self.api_key,
+                    'api_secret': self.api_secret,
+                    'return_attributes': 'age,gender'
+                }
+                
+                base_info = {'age': 25, 'gender': 'Female'}
+                
                 with open(image_path_or_url, 'rb') as image_file:
                     files = {'image_file': image_file}
-                    response_detect = requests.post(self.detect_url, data=detect_data, files=files, timeout=10)
-            
-            if response_detect and response_detect.status_code == 200:
-                detect_result = response_detect.json()
-                if detect_result.get('faces'):
-                    attrs = detect_result['faces'][0].get('attributes', {})
-                    base_info['age'] = attrs.get('age', {}).get('value', 25)
-                    base_info['gender'] = attrs.get('gender', {}).get('value', 'Female')
-                    logging.info(f"Detect API info: Age {base_info['age']}, Gender {base_info['gender']}")
-
-            # Step 2: Get detailed skin analysis using Skin Analyze API (v1)
-            self._handle_rate_limiting()
-            result = self._try_skin_analyze_api(image_path_or_url)
+                    response_detect = requests.post(self.detect_url, data=detect_data, files=files, timeout=15)
+                
+                if response_detect and response_detect.status_code == 200:
+                    detect_result = response_detect.json()
+                    if detect_result.get('faces'):
+                        attrs = detect_result['faces'][0].get('attributes', {})
+                        base_info['age'] = attrs.get('age', {}).get('value', 25)
+                        base_info['gender'] = attrs.get('gender', {}).get('value', 'Female')
+                        logging.info(f"Detect API info: Age {base_info['age']}, Gender {base_info['gender']}")
+    
+                # Step 2: Get detailed skin analysis using Skin Analyze API (v1)
+                self._handle_rate_limiting()
+                result = self._try_skin_analyze_api(image_path_or_url)
+            finally:
+                # Dọn dẹp file tạm
+                if is_temp and temp_file_path and os.path.exists(temp_file_path):
+                    try:
+                        os.remove(temp_file_path)
+                    except:
+                        pass
             
             if result and result.get('success'):
                 # Merge the accurate age/gender into the detailed skin result

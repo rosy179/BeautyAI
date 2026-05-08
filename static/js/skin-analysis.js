@@ -752,11 +752,25 @@ function renderVisualAnalysis() {
             try {
                 const itemData = data[item.key];
                 
-                // Some fields are just objects with 'value', some are arrays of rectangles
+                // Some fields are just objects with 'value', some are arrays of rectangles, 
+                // and some (Face++ v1) are objects with 'count' or 'list'
                 let hasIssue = false;
                 if (itemData !== undefined && itemData !== null) {
-                    if (typeof itemData === 'object' && itemData.value > 0) hasIssue = true;
-                    if (Array.isArray(itemData) && itemData.length > 0) hasIssue = true;
+                    if (typeof itemData === 'object') {
+                        // Check for 'value' (confidence/score)
+                        if (itemData.value !== undefined && itemData.value > 0) hasIssue = true;
+                        // Check for 'count' (Face++ v1 common)
+                        if (itemData.count !== undefined && itemData.count > 0) hasIssue = true;
+                        // Check for specific lists (acne_list, spot_list, etc.)
+                        for (let subKey in itemData) {
+                            if (subKey.includes('_list') && Array.isArray(itemData[subKey]) && itemData[subKey].length > 0) {
+                                hasIssue = true;
+                                break;
+                            }
+                        }
+                    } else if (Array.isArray(itemData) && itemData.length > 0) {
+                        hasIssue = true;
+                    }
                 }
 
                 if (hasIssue) {
