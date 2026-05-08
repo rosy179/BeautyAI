@@ -153,7 +153,11 @@
                     <div class="col-lg-6 mb-4 mb-lg-0">
                         <div class="skin-map-container p-2 position-relative shadow-lg rounded-4" style="background: white;">
                             <div class="analysis-overlay-wrapper position-relative" id="imageWrapper">
-                                <img src="{% if analysis.image_url and analysis.image_url.startswith('http') %}{{ analysis.image_url }}{% else %}/{{ analysis.image_url }}{% endif %}" alt="Bản đồ phân tích da" class="img-fluid rounded-4 w-100" id="analyzedImage">
+                                {% set display_url = analysis.image_url %}
+                                {% if display_url and 'res.cloudinary.com' in display_url and '/upload/' in display_url %}
+                                    {% set display_url = display_url.replace('/upload/', '/upload/w_800,c_limit,q_auto/') %}
+                                {% endif %}
+                                <img src="{% if display_url and display_url.startswith('http') %}{{ display_url }}{% else %}/{{ display_url }}{% endif %}" alt="Bản đồ phân tích da" class="img-fluid rounded-4 w-100" id="analyzedImage">
                                 <div id="analysisMarkers" class="position-absolute top-0 start-0 w-100 h-100" style="pointer-events: none;"></div>
                             </div>
                         </div>
