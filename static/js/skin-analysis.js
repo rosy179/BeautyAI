@@ -794,36 +794,35 @@ function renderVisualAnalysis() {
                     }
 
                     // Determine coordinate
-                    let x = null, y = null;
+                    let xPercent = null, yPercent = null;
                     const rect = findCoordinate(itemData);
                     
                     if (rect) {
-                        x = (rect.left + rect.width / 2) * scaleX;
-                        y = (rect.top + rect.height / 2) * scaleY;
+                        xPercent = (rect.left + rect.width / 2) / analysisWidth * 100;
+                        yPercent = (rect.top + rect.height / 2) / analysisHeight * 100;
                     }
                     
-                    // If no exact coordinate, default to a smart fallback location based on concern type
-                    if (x === null || y === null || isNaN(x) || isNaN(y)) {
-                        // Place them roughly where they usually appear
+                    // If no exact coordinate, default to a smart fallback location
+                    if (xPercent === null || yPercent === null || isNaN(xPercent)) {
                         const defaultPositions = {
-                            'acne': { x: 0.3, y: 0.6 },
-                            'forehead_wrinkle': { x: 0.5, y: 0.2 },
-                            'eye_finelines': { x: 0.2, y: 0.45 },
-                            'dark_circle': { x: 0.35, y: 0.5 },
-                            'skin_spot': { x: 0.25, y: 0.65 },
-                            'blackhead': { x: 0.5, y: 0.65 },
-                            'nasolabial_fold': { x: 0.35, y: 0.75 }
+                            'acne': { x: 30, y: 60 },
+                            'forehead_wrinkle': { x: 50, y: 20 },
+                            'eye_finelines': { x: 20, y: 45 },
+                            'dark_circle': { x: 35, y: 50 },
+                            'skin_spot': { x: 25, y: 65 },
+                            'blackhead': { x: 50, y: 65 },
+                            'nasolabial_fold': { x: 35, y: 75 }
                         };
-                        const pos = defaultPositions[item.key] || { x: 0.5, y: 0.5 };
-                        x = imgWidth * pos.x + (Math.random() * 20 - 10);
-                        y = imgHeight * pos.y + (Math.random() * 20 - 10);
+                        const pos = defaultPositions[item.key] || { x: 50, y: 50 };
+                        xPercent = pos.x + (Math.random() * 4 - 2);
+                        yPercent = pos.y + (Math.random() * 4 - 2);
                     }
 
-                    // Create Marker
+                    // Create Marker using Percentage for absolute precision
                     const marker = document.createElement('div');
                     marker.className = 'analysis-marker';
-                    marker.style.left = `${x}px`;
-                    marker.style.top = `${y}px`;
+                    marker.style.left = `${xPercent}%`;
+                    marker.style.top = `${yPercent}%`;
                     marker.id = `marker-${item.key}`;
                     markersContainer.appendChild(marker);
 

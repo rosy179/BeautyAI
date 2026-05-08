@@ -53,11 +53,23 @@ class FaceAnalyzer:
                     return self._get_fallback_analysis()
             
             try:
-                # Lấy kích thước ảnh thực tế để frontend scale tọa độ chính xác
-                from PIL import Image
+                # Chuẩn hóa ảnh: Xoay đúng hướng EXIF và thu nhỏ về 800px để tọa độ chuẩn xác
+                from PIL import Image, ImageOps
                 with Image.open(image_path_or_url) as img:
-                    analysis_width, analysis_height = img.size
-                logging.info(f"Analyzed image size: {analysis_width}x{analysis_height}")
+                    # Xoay ảnh dựa trên metadata EXIF (tránh lỗi ảnh dọc bị hiểu thành ảnh ngang)
+                    img = ImageOps.exif_transpose(img)
+                    
+                    # Thu nhỏ ảnh về chiều rộng 800px (giữ nguyên tỷ lệ)
+                    target_width = 800
+                    w_percent = (target_width / float(img.size[0]))
+                    target_height = int((float(img.size[1]) * float(w_percent)))
+                    img = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
+                    
+                    # Lưu đè lại file tạm với ảnh đã chuẩn hóa
+                    img.save(image_path_or_url, format="JPEG", quality=90)
+                    
+                    analysis_width, analysis_height = target_width, target_height
+                    logging.info(f"Normalized image size for analysis: {analysis_width}x{analysis_height}")
 
                 # Step 1: Get Age and Gender using Detect API (v3)
                 detect_data = {
