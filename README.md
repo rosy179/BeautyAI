@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="/static/layout.jpg" alt="BeautyAI Logo" width="100"/>
+  <img src="/static/layout.jpg" alt="BeautyAI Logo" width="1000" height="600"/>
   <h1>🌸 BeautyAI</h1>
   <p><strong>Ứng dụng Phân tích Da và Mỹ phẩm Thông minh tích hợp Trí tuệ Nhân tạo</strong></p>
   
