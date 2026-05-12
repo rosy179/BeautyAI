@@ -1,170 +1,175 @@
-# BeautyAI - Ứng dụng Phân tích Da và Mỹ phẩm
+<div align="center">
+  <img src="https://img.icons8.com/?size=100&id=aW2I8WvA6eHk&format=png&color=000000" alt="BeautyAI Logo" width="100"/>
+  <h1>🌸 BeautyAI</h1>
+  <p><strong>Ứng dụng Phân tích Da và Mỹ phẩm Thông minh tích hợp Trí tuệ Nhân tạo</strong></p>
+  
+  <a href="https://beauty-webapp.onrender.com/"><strong>🌎 Xem Web Demo Trực Tuyến</strong></a>
 
-Ứng dụng web toàn diện cho phân tích da, tư vấn sản phẩm mỹ phẩm và thương mại điện tử được xây dựng bằng Flask.
+  <br><br>
 
-## ✨ Tính năng chính
+  [![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
+  [![Flask](https://img.shields.io/badge/flask-v2.0+-lightgrey.svg)](https://flask.palletsprojects.com/)
+  [![Face++](https://img.shields.io/badge/AI-Face++-orange.svg)](https://www.faceplusplus.com/)
+  [![Stripe](https://img.shields.io/badge/Payment-Stripe-indigo.svg)](https://stripe.com/)
+</div>
 
-- **🔍 Phân tích da AI**: Sử dụng Face++ API để phân tích loại da, tuổi và các vấn đề về da
-- **📸 Chụp ảnh trực tiếp**: Tích hợp camera để chụp ảnh khuôn mặt ngay trên trình duyệt
-- **💄 Cửa hàng mỹ phẩm**: Hệ thống thương mại điện tử đầy đủ với giỏ hàng và thanh toán
-- **💬 Chatbot tư vấn**: AI tư vấn làm đẹp và chăm sóc da
-- **📝 Blog làm đẹp**: Hệ thống blog với bình luận và tương tác
-- **⭐ Đánh giá sản phẩm**: Người dùng có thể đánh giá và nhận xét sản phẩm
-- **💳 Thanh toán Stripe**: Tích hợp thanh toán trực tuyến an toàn
+<hr/>
 
-## 🚀 Hướng dẫn cài đặt
+BeautyAI là một nền tảng web toàn diện mang lại trải nghiệm cá nhân hóa cho người dùng trong việc chăm sóc sắc đẹp. Ứng dụng kết hợp sức mạnh của trí tuệ nhân tạo (AI) để phân tích da, tư vấn liệu trình chăm sóc, đồng thời tích hợp một hệ thống thương mại điện tử chuyên nghiệp để mua sắm mỹ phẩm.
+
+## ✨ Tính năng nổi bật
+
+- 🔍 **Phân tích da bằng AI**: Sử dụng công nghệ nhận diện khuôn mặt tiên tiến từ Face++ để chẩn đoán tình trạng da (mụn, đốm nâu, nếp nhăn,...), dự đoán độ tuổi và loại da.
+- 📸 **Camera trực tuyến**: Hỗ trợ chụp ảnh khuôn mặt và phân tích ngay trên trình duyệt mà không cần tải file.
+- 💄 **Cửa hàng Mỹ phẩm**: Hệ thống E-commerce hoàn chỉnh với giỏ hàng, quản lý đơn hàng và gợi ý sản phẩm theo tình trạng da.
+- 💬 **Trợ lý Ảo (Chatbot)**: Tích hợp AI tư vấn lộ trình chăm sóc da chuẩn y khoa và giải đáp các thắc mắc về làm đẹp.
+- 📝 **Cộng đồng & Blog**: Nơi người dùng có thể chia sẻ kinh nghiệm, đọc các bài viết về skincare và tương tác qua hệ thống bình luận.
+- ⭐ **Đánh giá & Review**: Tính năng rating và feedback giúp người dùng đưa ra quyết định mua hàng thông minh hơn.
+- 💳 **Thanh toán An toàn**: Tích hợp cổng thanh toán quốc tế Stripe, hỗ trợ thanh toán thẻ nhanh chóng và bảo mật.
+
+---
+
+## 🚀 Hướng dẫn cài đặt (Local Development)
 
 ### 1. Yêu cầu hệ thống
 
-- Python 3.8+
-- MySQL
-- Git
+- **Python** 3.8 trở lên
+- **MySQL** (Hoặc MariaDB)
+- **Git**
 
-### 2. Tải về và cài đặt
+### 2. Clone mã nguồn & Cài đặt môi trường
 
 ```bash
-# Clone repository
+# Clone repository về máy
 git clone <my-repository-url>
 cd beautyAI
 
-# Tạo môi trường ảo
+# Tạo môi trường ảo (Virtual Environment)
 python -m venv venv
 
 # Kích hoạt môi trường ảo
-# Windows:
+# Trên Windows:
 venv\Scripts\activate
-# macOS/Linux:
+# Trên macOS/Linux:
 source venv/bin/activate
 
-# Cài đặt dependencies
+# Cài đặt các thư viện cần thiết
 pip install -r dependencies.txt
 ```
 
-### 3. Cấu hình cơ sở dữ liệu
+### 3. Cấu hình Database (MySQL)
 
-## MySQL:
-
+Truy cập MySQL console và tạo database:
+```sql
 CREATE DATABASE beauty_app;
-\q
+```
 
-### 4. Cấu hình biến môi trường
+### 4. Thiết lập Biến môi trường
 
-Sao chép file `.env.example` thành `.env` và cập nhật thông tin:
-
+Nhân bản file `.env.example` thành `.env`:
 ```bash
 cp .env.example .env
 ```
+Mở file `.env` và điền các API keys tương ứng (xem phần Cấu hình API Keys bên dưới).
 
-Chỉnh sửa file `.env` với thông tin của bạn (xem chi tiết bên dưới).
-
-### 5. Khởi tạo database
+### 5. Khởi tạo dữ liệu
 
 ```bash
-# Test kết nối database
+# Kiểm tra kết nối tới Database và khởi tạo các bảng (tables)
 python test_mysql.py
 
-# Thêm dữ liệu mẫu (tùy chọn)
+# Thêm dữ liệu mẫu (Sản phẩm, User test...) vào hệ thống
 python seed_data.py
 ```
 
-### 6. Chạy ứng dụng
+### 6. Khởi chạy Ứng dụng
 
-## Development mode
-
+```bash
 python main.py
-
-Ứng dụng sẽ chạy tại: http://localhost:5000
-
-## 🔧 Cấu hình API Keys
-
-### Face++ API (Phân tích da)
-
-1. Truy cập: https://www.faceplusplus.com
-2. Đăng ký tài khoản miễn phí
-3. Tạo ứng dụng và lấy API Key & API Secret
-4. Thêm vào file `.env`:
-
 ```
+🎉 Ứng dụng sẽ chạy tại địa chỉ: **http://localhost:5000**
 
-FACEPP_API_KEY=your_api_key_here
-FACEPP_API_SECRET=your_api_secret_here
+---
 
-```
+## 🔑 Cấu hình API Keys
 
-### Stripe Payment (Thanh toán)
+Để các tính năng AI và thanh toán hoạt động, bạn cần đăng ký và thiết lập các khóa API sau trong file `.env`:
 
-1. Truy cập: https://stripe.com
-2. Đăng ký tài khoản
-3. Lấy Secret Key từ Dashboard
-4. Thêm vào file `.env`:
+<details>
+<summary><strong>1. Face++ API (Dùng cho Phân tích da)</strong></summary>
 
-```
+1. Truy cập [Face++ (Megvii)](https://www.faceplusplus.com) và đăng ký tài khoản.
+2. Tạo ứng dụng mới để lấy **API Key** và **API Secret**.
+3. Cập nhật vào `.env`:
+   ```env
+   FACEPP_API_KEY=your_api_key_here
+   FACEPP_API_SECRET=your_api_secret_here
+   ```
+</details>
 
-STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+<details>
+<summary><strong>2. Stripe API (Dùng cho Thanh toán)</strong></summary>
 
-```
+1. Truy cập [Stripe Dashboard](https://stripe.com) và đăng ký tài khoản.
+2. Chuyển sang chế độ Test mode và lấy **Secret Key**.
+3. Cập nhật vào `.env`:
+   ```env
+   STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+   ```
+</details>
 
-### OpenAI API (Chatbot - Tùy chọn)
+<details>
+<summary><strong>3. OpenAI API (Dùng cho Chatbot - Tùy chọn)</strong></summary>
 
-1. Truy cập: https://platform.openai.com
-2. Tạo API Key
-3. Thêm vào file `.env`:
+1. Truy cập [OpenAI Platform](https://platform.openai.com).
+2. Tạo một khóa API (API Key) mới.
+3. Cập nhật vào `.env`:
+   ```env
+   OPENAI_API_KEY=your_openai_api_key
+   ```
+</details>
 
-```
+---
 
-OPENAI_API_KEY=your_openai_api_key
-```
+## 📁 Cấu trúc Dự án
 
-## 📁 Cấu trúc thư mục
-
-```
-
+```text
 beautyAI/
-├── app.py # Khởi tạo Flask app
-├── extensions.py # Khởi tạo SQLAlchemy
-├── main.py # Entry point
-├── models.py # Database models
-├── routes.py # API endpoints
-├── forms.py # Form definitions
-├── face_analysis.py # Face++ integration
-├── test_mysql.py # Test database connection
-├── static/ # CSS, JS, images
-│ ├── css/
-│ ├── js/
-│ └── uploads/
-├── templates/ # HTML templates
-├── instance/ # Database files
-└── dependencies.txt # Python dependencies
-
+├── ⚙️ app.py                # Khởi tạo và cấu hình ứng dụng Flask
+├── 🔗 routes.py             # Quản lý Routing và Controller
+├── 🗄️ models.py             # Định nghĩa Database Schema (SQLAlchemy)
+├── 📝 forms.py              # Các form dữ liệu (WTForms)
+├── 🧠 face_analysis.py      # Logic tích hợp API Face++ xử lý hình ảnh
+├── 🚀 main.py               # File entry point chạy ứng dụng
+├── 📂 static/               # Tệp tĩnh (CSS, JS, Images, Uploads)
+│   ├── css/
+│   ├── js/
+│   └── uploads/
+├── 🖼️ templates/            # Giao diện HTML (Jinja2)
+└── 📦 dependencies.txt      # Danh sách thư viện Python
 ```
 
-## 🛠️ Troubleshooting
+---
 
-### Lỗi Face++ API
+## 🛠️ Xử lý Sự cố thường gặp (Troubleshooting)
 
-- Kiểm tra API credentials trong file `.env`
-- Đảm bảo có kết nối internet
-- Kiểm tra quota API (tài khoản miễn phí có giới hạn)
+| Lỗi / Sự cố | Cách khắc phục |
+| :--- | :--- |
+| **Không thể phân tích da** | - Kiểm tra `FACEPP_API_KEY` trong file `.env`<br>- Đảm bảo máy có kết nối Internet<br>- Kiểm tra quota (giới hạn) API của tài khoản Face++ miễn phí |
+| **Camera không bật được** | - Cấp quyền truy cập Camera cho trình duyệt<br>- Trình duyệt yêu cầu **HTTPS** để dùng Camera (trừ khi chạy `localhost`)<br>- Đảm bảo không có ứng dụng nào khác (Zoom, Meet...) đang chiếm dụng Camera |
 
-### Lỗi Camera không hoạt động
+---
 
-- Cho phép quyền truy cập camera trên trình duyệt
-- Sử dụng HTTPS trong production
-- Kiểm tra camera có được sử dụng bởi ứng dụng khác không
+## 🤝 Đóng góp (Contributing)
 
-## 📦 Dependencies chính
+Chúng tôi luôn hoan nghênh mọi đóng góp để phát triển dự án này!
+1. **Fork** repository này
+2. Tạo một **branch** mới cho tính năng của bạn (`git checkout -b feature/AmazingFeature`)
+3. **Commit** thay đổi (`git commit -m 'Thêm một tính năng tuyệt vời'`)
+4. **Push** lên branch đó (`git push origin feature/AmazingFeature`)
+5. Mở một **Pull Request**
 
-- **Flask**: Web framework
-- **SQLAlchemy**: ORM database
-- **Flask-Login**: Quản lý đăng nhập
-- **Requests**: HTTP client cho API calls
-
-## 🤝 Đóng góp
-1. Fork repository
-2. Tạo feature branch
-3. Commit changes
-4. Push to branch
-5. Tạo Pull Request
-
-## 📽️ Web Demo
-https://beauty-webapp.onrender.com/
+---
+<div align="center">
+  <i>Được xây dựng với ❤️ bằng Python & Flask</i>
+</div>
