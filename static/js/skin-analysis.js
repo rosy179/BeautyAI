@@ -734,6 +734,9 @@ function renderVisualAnalysis() {
         // Use analysis dimensions from server if available, otherwise fallback to natural dimensions
         const analysisWidth = data.analysis_width || img.naturalWidth;
         const analysisHeight = data.analysis_height || img.naturalHeight;
+        
+        // Use the nested skin_analysis object for feature data
+        const analysisData = data.skin_analysis || data;
 
         const scaleX = imgWidth / analysisWidth;
         const scaleY = imgHeight / analysisHeight;
@@ -752,7 +755,7 @@ function renderVisualAnalysis() {
 
         concerns.forEach((item, index) => {
             try {
-                const itemData = data[item.key];
+                const itemData = analysisData[item.key];
                 
                 // Some fields are just objects with 'value', some are arrays of rectangles, 
                 // and some (Face++ v1) are objects with 'count' or 'list'
@@ -802,20 +805,50 @@ function renderVisualAnalysis() {
                         yPercent = (rect.top + rect.height / 2) / analysisHeight * 100;
                     }
                     
-                    // If no exact coordinate, default to a smart fallback location
+                    // If no exact coordinate, default to a smart fallback location based on face bounding box
                     if (xPercent === null || yPercent === null || isNaN(xPercent)) {
-                        const defaultPositions = {
-                            'acne': { x: 30, y: 60 },
-                            'forehead_wrinkle': { x: 50, y: 20 },
-                            'eye_finelines': { x: 20, y: 45 },
-                            'dark_circle': { x: 35, y: 50 },
-                            'skin_spot': { x: 25, y: 65 },
-                            'blackhead': { x: 50, y: 65 },
-                            'nasolabial_fold': { x: 35, y: 75 }
-                        };
-                        const pos = defaultPositions[item.key] || { x: 50, y: 50 };
-                        xPercent = pos.x + (Math.random() * 4 - 2);
-                        yPercent = pos.y + (Math.random() * 4 - 2);
+                        let faceRect = data.face_rectangle;
+                        if (!faceRect && data.skin_analysis && data.skin_analysis.face_rectangle) {
+                            faceRect = data.skin_analysis.face_rectangle;
+                        }
+                        
+                        if (faceRect) {
+                            // Relative to face bounding box (0-100% of face width/height)
+                            const facePositions = {
+                                'acne': { x: 20, y: 60 }, // left cheek
+                                'forehead_wrinkle': { x: 50, y: 15 }, // middle forehead
+                                'eye_finelines': { x: 80, y: 40 }, // right eye corner
+                                'dark_circle': { x: 30, y: 45 }, // under left eye
+                                'skin_spot': { x: 75, y: 65 }, // right cheek
+                                'blackhead': { x: 50, y: 65 }, // nose
+                                'nasolabial_fold': { x: 35, y: 75 } // left mouth corner
+                            };
+                            const pos = facePositions[item.key] || { x: 50, y: 50 };
+                            
+                            const pixelX = faceRect.left + (faceRect.width * pos.x / 100);
+                            const pixelY = faceRect.top + (faceRect.height * pos.y / 100);
+                            
+                            xPercent = (pixelX / analysisWidth) * 100;
+                            yPercent = (pixelY / analysisHeight) * 100;
+                            
+                            // Add some random jitter
+                            xPercent += (Math.random() * 4 - 2);
+                            yPercent += (Math.random() * 4 - 2);
+                        } else {
+                            // Fallback to absolute image percentage if no face_rectangle is available
+                            const defaultPositions = {
+                                'acne': { x: 30, y: 60 },
+                                'forehead_wrinkle': { x: 50, y: 20 },
+                                'eye_finelines': { x: 20, y: 45 },
+                                'dark_circle': { x: 35, y: 50 },
+                                'skin_spot': { x: 25, y: 65 },
+                                'blackhead': { x: 50, y: 65 },
+                                'nasolabial_fold': { x: 35, y: 75 }
+                            };
+                            const pos = defaultPositions[item.key] || { x: 50, y: 50 };
+                            xPercent = pos.x + (Math.random() * 4 - 2);
+                            yPercent = pos.y + (Math.random() * 4 - 2);
+                        }
                     }
 
                     // Create Marker using Percentage for absolute precision
