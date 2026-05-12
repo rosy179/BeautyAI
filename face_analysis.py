@@ -78,7 +78,7 @@ class FaceAnalyzer:
                     'return_attributes': 'age,gender'
                 }
                 
-                base_info = {'age': 25, 'gender': 'Female'}
+                base_info = {'age': 25, 'gender': 'Female', 'face_rectangle': None}
                 
                 with open(image_path_or_url, 'rb') as image_file:
                     files = {'image_file': image_file}
@@ -87,9 +87,11 @@ class FaceAnalyzer:
                 if response_detect and response_detect.status_code == 200:
                     detect_result = response_detect.json()
                     if detect_result.get('faces'):
-                        attrs = detect_result['faces'][0].get('attributes', {})
+                        face_data = detect_result['faces'][0]
+                        attrs = face_data.get('attributes', {})
                         base_info['age'] = attrs.get('age', {}).get('value', 25)
                         base_info['gender'] = attrs.get('gender', {}).get('value', 'Female')
+                        base_info['face_rectangle'] = face_data.get('face_rectangle')
                         logging.info(f"Detect API info: Age {base_info['age']}, Gender {base_info['gender']}")
     
                 # Step 2: Get detailed skin analysis using Skin Analyze API (v1)
@@ -111,6 +113,8 @@ class FaceAnalyzer:
                 # Merge the accurate age/gender into the detailed skin result
                 result['age'] = base_info['age']
                 result['gender'] = base_info['gender']
+                if base_info.get('face_rectangle'):
+                    result['face_rectangle'] = base_info['face_rectangle']
                 return result
             
             # If Skin Analyze fails, return fallback with the age we found
@@ -255,7 +259,8 @@ class FaceAnalyzer:
             'concerns': concerns,
             'skin_status': skin_status,
             'recommended_routine': routine,
-            'confidence': face.get('face_rectangle', {})
+            'face_rectangle': face.get('face_rectangle', {}),
+            'confidence': 0.8
         }
     
     def _determine_skin_type(self, skin_status):
