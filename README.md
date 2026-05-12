@@ -166,6 +166,5 @@ beautyAI/
 4. Push to branch
 5. Tạo Pull Request
 
-## 📽️ Video Demo
-
-[![Demo Video](https://img.youtube.com/vi/0ILMeBvXkZ4/0.jpg)](https://youtu.be/0ILMeBvXkZ4)
+## 📽️ Web Demo
+https://beauty-webapp.onrender.com/
