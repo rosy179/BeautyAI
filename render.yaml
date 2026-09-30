@@ -6,7 +6,9 @@ services:
     startCommand: gunicorn main:app
     envVars:
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: beauty-db
+          property: connectionString
       - key: SESSION_SECRET
         generateValue: true
       - key: PYTHON_VERSION

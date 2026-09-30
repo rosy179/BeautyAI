@@ -4,19 +4,27 @@ Run this after setting up the database to have demo data
 """
 
 import logging
-from app import create_app
-from extensions import db  # Nhập db từ extensions.py
+from extensions import db
 from werkzeug.security import generate_password_hash
+from flask import has_app_context
 
-app = create_app()
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
-def create_sample_data():
+def create_sample_data(app=None):
     """Create sample data for the beauty app"""
     from models import User, Category, Product, BlogPost  # Nhập mô hình trong hàm
     
-    with app.app_context():
+    should_pop = False
+    if not has_app_context():
+        if app is None:
+            from app import create_app
+            app = create_app()
+        ctx = app.app_context()
+        ctx.push()
+        should_pop = True
+
+    try:
         logging.info("Bắt đầu tạo dữ liệu mẫu...")
         
         try:
@@ -211,6 +219,12 @@ sự khác biệt trên làn da của bạn!''',
             db.session.rollback()
             logging.error(f"Lỗi khi tạo dữ liệu mẫu: {e}")
             raise
+    finally:
+        if should_pop:
+            ctx.pop()
 
 if __name__ == '__main__':
-    create_sample_data()
+    from app import create_app
+    app = create_app()
+    with app.app_context():
+        create_sample_data(app)
